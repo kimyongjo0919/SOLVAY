@@ -6,116 +6,165 @@
 <title>SOLVAY 슬로프 워치 2번 화면</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: 전시용 2번 화면 — 왼쪽 큰 3D 광주시 산사태 모식도, 오른쪽 흙돌이+결과 숫자, 아래 실시간 그래프 4개. 스크롤 없이 모니터 한 장 */
+/* 전시용 2번 화면 — "재난 상황실": 왼쪽 큰 3D 광주시 산사태 모식도, 오른쪽 흙돌이+결과 숫자, 아래 실시간 그래프 4개. 스크롤 없이 모니터 한 장 */
 :root {
-  --bg: #eef6ea;
-  --surface: #ffffff;
-  --surface-2: #f5f9f2;
-  --ink: #2b3a2c;
-  --muted: #6b7a6a;
-  --line: #d9e6d2;
-  --accent: #3f8f4a;
-  --accent-soft: #e1f1dc;
-  --accent-ink: #ffffff;
-  --soil: #a8743f;
-  --warn: #e8900f;
-  --warn-soft: #fff1d9;
-  --danger: #e04f3c;
-  --danger-soft: #fde4df;
-  --sky-top: #bfe3ff;
-  --sky-bottom: #eef7ff;
-  --shadow: rgba(63, 110, 55, 0.16);
-  --font-display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --font-body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  color-scheme: light;
+  --bg: #080c11;
+  --bg-2: #0d131a;
+  --surface: #10171f;
+  --surface-2: #161f2a;
+  --surface-3: #1d2834;
+  --ink: #e9eff6;
+  --muted: #8b9aab;
+  --dim: #5d6b7b;
+  --line: #233040;
+  --line-2: #314255;
+  --cyan: #3ec5ff;
+  --green: #2fd27a;
+  --amber: #ffb020;
+  --orange: #ff6a1a;
+  --red: #ff3b30;
+  --accent: #3ec5ff;
+  --accent-soft: rgba(62, 197, 255, 0.12);
+  --accent-ink: #04131c;
+  --soil: #ffb020;
+  --warn: #ff6a1a;
+  --warn-soft: rgba(255, 106, 26, 0.14);
+  --danger: #ff3b30;
+  --danger-soft: rgba(255, 59, 48, 0.16);
+  --lv: var(--dim);
+  --lv-soft: rgba(93, 107, 123, 0.12);
+  --font-display: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "Chakra Petch", "IBM Plex Sans KR", ui-monospace, monospace;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #141c16; --surface: #1d2820; --surface-2: #18221b; --ink: #e6f0e3; --muted: #9fb19c; --line: #2e3d31;
-    --accent: #7fcf87; --accent-soft: #233a27; --accent-ink: #10200f; --soil: #d4a06a;
-    --warn: #f6b64e; --warn-soft: #3a2c12; --danger: #f27461; --danger-soft: #3d1f1a;
-    --sky-top: #24364a; --sky-bottom: #3d5568; --shadow: rgba(0, 0, 0, 0.35); color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #141c16; --surface: #1d2820; --surface-2: #18221b; --ink: #e6f0e3; --muted: #9fb19c; --line: #2e3d31;
-  --accent: #7fcf87; --accent-soft: #233a27; --accent-ink: #10200f; --soil: #d4a06a;
-  --warn: #f6b64e; --warn-soft: #3a2c12; --danger: #f27461; --danger-soft: #3d1f1a;
-  --sky-top: #24364a; --sky-bottom: #3d5568; --shadow: rgba(0, 0, 0, 0.35); color-scheme: dark;
-}
+body[data-lv="1"] { --lv: var(--green); --lv-soft: rgba(47, 210, 122, 0.10); }
+body[data-lv="2"] { --lv: var(--amber); --lv-soft: rgba(255, 176, 32, 0.12); }
+body[data-lv="3"] { --lv: var(--orange); --lv-soft: rgba(255, 106, 26, 0.15); }
+body[data-lv="4"] { --lv: var(--red); --lv-soft: rgba(255, 59, 48, 0.18); }
+body[data-lv="c"] { --lv: var(--cyan); --lv-soft: rgba(62, 197, 255, 0.10); }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
+html { background: var(--bg); }
 body {
-  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  background: radial-gradient(1400px 600px at 50% -200px, var(--lv-soft), transparent 70%), var(--bg);
+  color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 12px;
 }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 30; opacity: 0; box-shadow: inset 0 0 0 4px var(--lv), inset 0 0 160px 20px var(--lv-soft); }
+body[data-lv="3"]:not([data-done])::after { opacity: 1; animation: edgePulse 1.6s ease-in-out infinite; }
+body[data-lv="4"]:not([data-done])::after { opacity: 1; animation: edgePulse .7s ease-in-out infinite; box-shadow: inset 0 0 0 5px var(--red), inset 0 0 220px 40px rgba(255, 59, 48, 0.3); }
+@keyframes edgePulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 [hidden] { display: none !important; }
 .wrap { height: 100%; min-height: 680px; display: grid; grid-template-rows: auto minmax(0, 1fr) minmax(210px, 29vh); gap: 12px; }
-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-header h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 2.3vw, 40px); color: var(--accent); line-height: 1.1; }
-header h1 span { color: var(--soil); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { font-family: var(--font-display); font-size: clamp(15px, 1.15vw, 20px); padding: 5px 16px; border-radius: 999px; background: var(--surface); box-shadow: 0 3px 0 var(--shadow); }
-.chip.cond { background: var(--accent); color: var(--accent-ink); }
-.chip.off { background: var(--danger-soft); color: var(--danger); }
-.snd { display: flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px; border-radius: 999px; background: var(--surface); box-shadow: 0 3px 0 var(--shadow); }
-.snd button { font-family: var(--font-display); font-size: clamp(15px, 1.1vw, 19px); border: 0; border-radius: 999px; padding: 4px 14px; cursor: pointer; background: var(--accent); color: var(--accent-ink); }
-.snd button.off { background: var(--warn); color: #fff; animation: pulse 1.6s ease-in-out infinite; }
-.snd button:focus-visible, .snd input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.snd input { width: 110px; accent-color: var(--accent); }
-.qrmini { display: flex; align-items: center; gap: 8px; border: 0; cursor: pointer; background: var(--surface); border-radius: 16px; padding: 4px 12px 4px 4px; box-shadow: 0 3px 0 var(--shadow); font-family: var(--font-display); font-size: clamp(14px, 1.05vw, 18px); color: var(--ink); text-align: left; line-height: 1.2; }
-.qrmini #qrSmall { background: #fff; padding: 4px; border-radius: 10px; }
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.logo { width: 50px; height: 50px; flex: none; border-radius: 12px; display: grid; place-items: center;
+  background: repeating-linear-gradient(-45deg, var(--amber) 0 7px, #14100a 7px 14px); box-shadow: 0 0 0 2px #000, 0 0 0 3px var(--amber); }
+.logo span { width: 32px; height: 32px; border-radius: 8px; background: #0b0f14; color: var(--amber); display: grid; place-items: center; font-family: var(--font-display); font-size: 24px; line-height: 1; }
+header h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 2.3vw, 40px); color: var(--ink); line-height: 1.05; }
+header h1 span { color: var(--amber); }
+.brand p { margin: 2px 0 0; font-family: var(--font-mono); font-size: clamp(11px, 0.8vw, 14px); letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+.lvchip { display: flex; flex-direction: column; justify-content: center; padding: 4px 18px 4px 16px; border-radius: 12px; border: 1px solid var(--lv); background: var(--lv-soft); position: relative; min-width: 128px; }
+.lvchip small { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; color: var(--muted); }
+.lvchip b { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 2.2vw, 40px); line-height: 1.05; color: var(--lv); text-shadow: 0 0 22px var(--lv); }
+body[data-lv="4"]:not([data-done]) .lvchip b { animation: textFlash .5s steps(2, end) infinite; }
+@keyframes textFlash { 50% { color: #fff; } }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { font-family: var(--font-body); font-weight: 600; font-size: clamp(14px, 1.05vw, 18px); padding: 6px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line-2); }
+.chip.cond { background: rgba(255, 176, 32, 0.14); border-color: var(--amber); color: #ffd68a; }
+.chip.off { background: var(--danger-soft); border-color: rgba(255, 59, 48, .5); color: #ffb3ad; }
+.chip.live { color: var(--green); border-color: rgba(47, 210, 122, .45); }
+.chip.live::before { content: "● "; animation: blinkDot 1.4s infinite; }
+@keyframes blinkDot { 50% { opacity: .3; } }
+.snd { display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 4px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line-2); }
+.snd button { font-family: var(--font-body); font-weight: 600; font-size: clamp(14px, 1vw, 17px); border: 0; border-radius: 8px; padding: 5px 14px; cursor: pointer; background: var(--cyan); color: var(--accent-ink); }
+.snd button.off { background: var(--amber); color: #1a1200; animation: pulse 1.6s ease-in-out infinite; }
+.snd button:focus-visible, .snd input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.snd input { width: 110px; accent-color: var(--cyan); }
+.qrmini { display: flex; align-items: center; gap: 8px; border: 1px solid var(--amber); cursor: pointer; background: var(--surface); border-radius: 12px; padding: 4px 12px 4px 4px; font-family: var(--font-display); font-size: clamp(14px, 1.05vw, 18px); color: var(--ink); text-align: left; line-height: 1.2; }
+.qrmini #qrSmall { background: #fff; padding: 4px; border-radius: 8px; }
 .qrmini #qrSmall img, .qrmini #qrSmall canvas { display: block; width: 64px !important; height: 64px !important; }
-.qrmodal { position: fixed; inset: 0; z-index: 40; background: rgba(20, 28, 22, 0.75); display: grid; place-items: center; padding: 20px; }
-.qrbox { background: #ffffff; color: #2b3a2c; border-radius: 28px; padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 92vw; }
-.qrbox h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 34px; color: #3f8f4a; }
-.qrbox #qrBig { background: #fff; padding: 12px; }
+.qrmodal { position: fixed; inset: 0; z-index: 40; background: rgba(3, 6, 9, 0.86); backdrop-filter: blur(4px); display: grid; place-items: center; padding: 20px; }
+.qrbox { background: var(--surface); border: 1px solid var(--line-2); color: var(--ink); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 92vw; position: relative; overflow: hidden; }
+.qrbox::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: repeating-linear-gradient(-45deg, var(--amber) 0 12px, #111 12px 24px); }
+.qrbox h2 { margin: 6px 0 0; font-family: var(--font-display); font-weight: 400; font-size: 36px; color: var(--amber); }
+.qrbox #qrBig { background: #fff; padding: 14px; border-radius: 12px; }
 .qrbox #qrBig img, .qrbox #qrBig canvas { display: block; width: min(60vh, 70vw, 440px) !important; height: auto !important; }
-.qrbox p { margin: 0; font-size: 16px; color: #5a6460; overflow-wrap: anywhere; }
-.qrbox button { font-family: var(--font-display); font-size: 18px; border: 0; border-radius: 999px; padding: 8px 22px; cursor: pointer; background: #3f8f4a; color: #fff; }
+.qrbox p { margin: 0; font-size: 16px; color: var(--muted); overflow-wrap: anywhere; }
+.qrbox button { font-family: var(--font-body); font-weight: 600; font-size: 18px; border: 0; border-radius: 10px; padding: 8px 22px; cursor: pointer; background: var(--cyan); color: var(--accent-ink); }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 .mid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); gap: 12px; min-height: 0; }
-.scene { position: relative; border-radius: 26px; overflow: hidden; min-height: 0; box-shadow: 0 4px 0 var(--shadow);
-  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); }
+.scene { position: relative; border-radius: 16px; overflow: hidden; min-height: 0; border: 1px solid var(--line-2); background: #0b1118; }
+body[data-lv="3"] .scene { border-color: var(--orange); box-shadow: 0 0 40px -12px var(--orange); }
+body[data-lv="4"] .scene { border-color: var(--red); box-shadow: 0 0 50px -10px var(--red); }
 .scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 .scene canvas.dragging { cursor: grabbing; }
-.viewbar { position: absolute; left: 14px; bottom: 46px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.viewbar button { font-family: var(--font-display); font-size: 14px; border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; background: rgba(255, 255, 255, 0.9); color: #2b3a2c; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2); }
-.viewbar button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.viewbar .hint { font-size: 12px; background: rgba(255, 255, 255, 0.78); color: #2b3a2c; padding: 3px 10px; border-radius: 999px; }
+.scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+body[data-lv="4"]:not([data-done]) .scene::after { background: radial-gradient(ellipse at center, transparent 45%, rgba(120, 0, 0, .55) 100%); }
+.corner { position: absolute; width: 26px; height: 26px; border: 2px solid rgba(62, 197, 255, .7); pointer-events: none; z-index: 2; }
+.corner.tl { left: 10px; top: 10px; border-right: 0; border-bottom: 0; }
+.corner.tr { right: 10px; top: 10px; border-left: 0; border-bottom: 0; }
+.corner.bl { left: 10px; bottom: 10px; border-right: 0; border-top: 0; }
+.corner.br { right: 10px; bottom: 10px; border-left: 0; border-top: 0; }
+.viewbar { position: absolute; left: 18px; bottom: 48px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; z-index: 3; }
+.viewbar button { font-family: var(--font-body); font-weight: 600; font-size: 13px; border: 1px solid var(--line-2); border-radius: 8px; padding: 5px 12px; cursor: pointer; background: rgba(8, 12, 17, 0.82); color: var(--ink); backdrop-filter: blur(4px); }
+.viewbar button.on { border-color: var(--cyan); color: var(--cyan); }
+.viewbar button:hover { border-color: var(--muted); }
+.viewbar button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.viewbar .hint { font-size: 12px; background: rgba(8, 12, 17, 0.7); color: var(--muted); padding: 3px 10px; border-radius: 6px; }
 .scene .fail { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; font-family: var(--font-display); font-size: 22px; color: var(--ink); }
-.ov { position: absolute; pointer-events: none; }
-.banner { left: 14px; right: 14px; top: 14px; padding: 12px 18px; border-radius: 18px; font-family: var(--font-display);
-  font-size: clamp(20px, 2vw, 34px); color: #fff; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.banner.base { background: rgba(29, 42, 32, 0.8); }
-.banner.pre { background: rgba(232, 144, 15, 0.94); }
-.banner.col { background: rgba(224, 79, 60, 0.95); }
-.cap { left: 14px; bottom: 12px; font-size: clamp(12px, 0.85vw, 14px); background: rgba(255, 255, 255, 0.78); color: #2b3a2c; padding: 4px 12px; border-radius: 999px; }
-.dmg { right: 14px; bottom: 56px; font-family: var(--font-display); font-size: clamp(18px, 1.6vw, 28px); background: rgba(224, 79, 60, 0.95); color: #fff; padding: 6px 16px; border-radius: 16px; }
-.rain { right: 14px; bottom: 12px; font-family: var(--font-display); font-size: clamp(14px, 1.1vw, 18px); background: rgba(40, 90, 140, 0.85); color: #fff; padding: 4px 14px; border-radius: 999px; }
+.ov { position: absolute; pointer-events: none; z-index: 3; }
+.banner { left: 0; right: 0; top: 0; padding: 12px 22px; font-family: var(--font-display);
+  font-size: clamp(22px, 2.2vw, 38px); color: #fff; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; letter-spacing: .02em; }
+.banner #bannerV { font-family: var(--font-mono); font-weight: 700; }
+.banner.base { background: linear-gradient(90deg, rgba(10, 40, 58, .95), rgba(10, 40, 58, .7)); border-bottom: 2px solid var(--cyan); }
+.banner.pre { background: linear-gradient(90deg, rgba(255, 106, 26, .96), rgba(200, 60, 0, .88)); border-bottom: 3px solid var(--amber); }
+.banner.pre::before, .banner.col::before { content: "⚠"; }
+.banner.col { background: linear-gradient(90deg, rgba(220, 20, 20, .97), rgba(150, 8, 8, .9)); border-bottom: 3px solid #fff; animation: banFlash .6s steps(2, end) infinite; }
+@keyframes banFlash { 50% { background: linear-gradient(90deg, rgba(110, 0, 0, .97), rgba(70, 0, 0, .9)); } }
+body[data-done] .banner.col { animation: none; }
+.cap { left: 18px; bottom: 16px; font-size: clamp(12px, 0.85vw, 14px); background: rgba(8, 12, 17, 0.78); color: var(--muted); padding: 4px 12px; border-radius: 6px; border: 1px solid var(--line); }
+.dmg { right: 18px; bottom: 58px; font-family: var(--font-display); font-size: clamp(18px, 1.6vw, 28px); background: var(--red); color: #fff; padding: 6px 16px; border-radius: 10px; box-shadow: 0 0 30px -4px var(--red); }
+.evac { right: 18px; bottom: 58px; font-family: var(--font-body); font-weight: 700; font-size: clamp(15px, 1.2vw, 20px); background: rgba(47, 210, 122, 0.18); border: 1px solid var(--green); color: #b8f5d2; padding: 6px 14px; border-radius: 10px; backdrop-filter: blur(4px); }
+.evac::before { content: "🏃 "; }
+.rain { right: 18px; bottom: 16px; font-family: var(--font-body); font-weight: 600; font-size: clamp(13px, 1vw, 16px); background: rgba(20, 60, 100, 0.85); border: 1px solid rgba(62, 197, 255, .5); color: #cfeaff; padding: 4px 14px; border-radius: 6px; }
+.rain::before { content: "☔ "; }
+.risk { right: 18px; top: 82px; width: min(240px, 34%); background: rgba(8, 12, 17, 0.8); border: 1px solid var(--line-2); border-radius: 10px; padding: 8px 12px; backdrop-filter: blur(4px); }
+.risk .k { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--muted); font-family: var(--font-mono); letter-spacing: .1em; }
+.risk .k b { font-family: var(--font-mono); font-size: 22px; color: var(--ink); letter-spacing: 0; }
+.risk .bar { height: 10px; border-radius: 3px; background: var(--bg-2); overflow: hidden; margin-top: 4px; border: 1px solid var(--line); }
+.risk .bar i { display: block; height: 100%; width: 0%; background: var(--green); transition: width .3s, background .3s; }
+.risk .bar i[data-lv="2"] { background: var(--amber); }
+.risk .bar i[data-lv="3"] { background: var(--orange); }
+.risk .bar i[data-lv="4"] { background: repeating-linear-gradient(-45deg, var(--red) 0 8px, #a60f08 8px 16px); }
 .side { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 12px; min-height: 0; }
-.card { background: var(--surface); border-radius: 26px; padding: 14px 18px; box-shadow: 0 4px 0 var(--shadow); min-width: 0; min-height: 0; }
-.buddy { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 4px solid var(--accent-soft); }
-.buddy[data-tone="warn"] { border-color: var(--warn); background: var(--warn-soft); }
-.buddy[data-tone="danger"] { border-color: var(--danger); background: var(--danger-soft); }
-.bubble { position: relative; align-self: stretch; background: var(--surface-2); border-radius: 20px; padding: 10px 16px; text-align: center;
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 18px; min-width: 0; min-height: 0; }
+.buddy { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: radial-gradient(300px 200px at 50% 80%, var(--lv-soft), transparent 70%), var(--surface); }
+.buddy[data-tone="warn"] { border-color: var(--orange); }
+.buddy[data-tone="danger"] { border-color: var(--red); }
+.bubble { position: relative; align-self: stretch; background: var(--surface-3); border: 1px solid var(--line-2); border-radius: 14px; padding: 10px 16px; text-align: center;
   font-family: var(--font-display); font-size: clamp(20px, 1.9vw, 34px); line-height: 1.25; text-wrap: balance; }
-.buddy[data-tone] .bubble { background: var(--surface); }
-.bubble::after { content: ""; position: absolute; left: 50%; bottom: -12px; margin-left: -12px; border: 12px solid transparent; border-top-color: var(--surface-2); border-bottom: 0; }
-.buddy[data-tone] .bubble::after { border-top-color: var(--surface); }
-.buddy .mascot { width: auto; height: 100%; max-height: 260px; min-height: 90px; max-width: 100%; flex: 1 1 auto; margin-top: 6px; }
+.buddy[data-tone="warn"] .bubble { border-color: var(--orange); color: #ffd7bf; }
+.buddy[data-tone="danger"] .bubble { border-color: var(--red); background: rgba(255, 59, 48, 0.2); color: #fff; }
+.bubble::after { content: ""; position: absolute; left: 50%; bottom: -10px; margin-left: -10px; width: 18px; height: 18px; background: inherit; border-right: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); transform: rotate(45deg); }
+.buddy[data-tone="warn"] .bubble::after { border-color: var(--orange); }
+.buddy[data-tone="danger"] .bubble::after { border-color: var(--red); background: #3a1616; }
+.buddy .mascot { width: auto; height: 100%; max-height: 260px; min-height: 90px; max-width: 100%; flex: 1 1 auto; margin-top: 8px; filter: drop-shadow(0 10px 16px rgba(0,0,0,.55)); }
 .nums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.num { background: var(--surface-2); border-radius: 18px; padding: 6px 14px; min-width: 0; }
-.num .k { font-family: var(--font-display); font-size: clamp(14px, 1vw, 18px); }
-.num .v { font-family: var(--font-display); font-size: clamp(20px, 1.7vw, 32px); line-height: 1.15; font-variant-numeric: tabular-nums; }
-.num.lead { grid-column: span 2; background: var(--accent-soft); display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.num.lead .v { font-size: clamp(34px, 3.4vw, 60px); color: var(--accent); }
+.num { background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 6px 14px; min-width: 0; }
+.num .k { font-weight: 600; font-size: clamp(13px, 0.95vw, 17px); color: var(--muted); }
+.num .v { font-family: var(--font-mono); font-weight: 700; font-size: clamp(20px, 1.7vw, 32px); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.num.lead { grid-column: span 2; background: linear-gradient(135deg, rgba(62,197,255,.16), rgba(62,197,255,.03)); border-color: rgba(62, 197, 255, 0.45); display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.num.lead .k { color: var(--cyan); }
+.num.lead .v { font-size: clamp(34px, 3.4vw, 60px); color: #fff; text-shadow: 0 0 24px rgba(62,197,255,.55); }
 .charts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; min-height: 0; }
-.chart { background: var(--surface); border-radius: 22px; padding: 10px 14px; display: flex; flex-direction: column; min-width: 0; min-height: 0; box-shadow: 0 4px 0 var(--shadow); }
+.chart { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; min-width: 0; min-height: 0; position: relative; }
+.chart::before { content: ""; position: absolute; left: 14px; top: 0; width: 40px; height: 3px; background: var(--cyan); border-radius: 0 0 3px 3px; }
 .chart h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(16px, 1.25vw, 22px); }
 .chart p { margin: 0 0 4px; font-size: clamp(12px, 0.8vw, 14px); color: var(--muted); }
 .chart canvas { flex: 1 1 auto; width: 100%; min-height: 110px; display: block; }
@@ -127,7 +176,7 @@ header h1 span { color: var(--soil); }
   .charts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .chart canvas { height: 200px; }
 }
-@media (max-width: 640px) { .charts { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) { .charts { grid-template-columns: minmax(0, 1fr); } .risk { top: 70px; } }
 
 /* 흙돌이 (1번 화면과 같은 캐릭터) */
 .mascot { display: block; overflow: visible; }
@@ -146,6 +195,9 @@ header h1 span { color: var(--soil); }
 .mascot[data-mood="happy"] :is(.arm-up, .e-happy, .m-big, .spark),
 .mascot[data-mood="proud"] :is(.arm-wave, .e-star, .m-cat, .spark),
 .mascot[data-mood="confused"] :is(.arm-down, .e-swirl, .m-wave, .qmark) { display: inline; }
+.mascot .hlamp { opacity: 0; }
+.mascot:is([data-mood="worried"], [data-mood="panic"], [data-mood="collapse"]) .hlamp { opacity: 1; animation: lamp .5s steps(2, end) infinite; }
+@keyframes lamp { 50% { fill: #ffe3a0; } }
 .mascot[data-mood="calm"] .mbody { animation: bob 3s ease-in-out infinite; }
 .mascot[data-mood="calm"] .blink, .mascot[data-mood="ready"] .blink { animation: blink 4s infinite; }
 .mascot[data-mood="ready"] .wv, .mascot[data-mood="proud"] .wv { animation: wave .9s ease-in-out infinite; }
@@ -169,10 +221,14 @@ header h1 span { color: var(--soil); }
 <script src="three.min.js"></script>
 <script>if (!window.THREE) { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>'); }</script>
 </head>
-<body>
+<body data-lv="0">
 <div class="wrap">
   <header>
-    <h1>SOLVAY <span>슬로프 워치</span></h1>
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span>!</span></div>
+      <div><h1>SOLVAY <span>슬로프 워치</span></h1><p>Gwangju landslide watch · 산사태 모의 관제</p></div>
+      <div class="lvchip" aria-live="polite"><small>SOLVAY 모의 경보 단계</small><b id="lvName">대기</b></div>
+    </div>
     <div class="chips">
       <span class="chip cond" id="cCond">조건 –</span>
       <span class="chip" id="cName">–</span>
@@ -186,6 +242,8 @@ header h1 span { color: var(--soil); }
   <div class="mid">
     <div class="scene" id="scene">
       <canvas id="gl"></canvas>
+      <i class="corner tl" aria-hidden="true"></i><i class="corner tr" aria-hidden="true"></i><i class="corner bl" aria-hidden="true"></i><i class="corner br" aria-hidden="true"></i>
+      <div class="ov risk" id="risk"><div class="k"><span>사면 위험도</span><b id="riskV">0%</b></div><div class="bar"><i id="riskFill" data-lv="1"></i></div></div>
       <div class="fail" id="fail" hidden>3D 지형을 불러오지 못했어요.<br>three.min.js 파일이 같은 폴더에 있는지 확인해 주세요. 그래프는 그대로 작동해요.</div>
       <div class="ov banner base" id="banner" hidden><span id="bannerT"></span><span id="bannerV"></span></div>
       <div class="ov rain" id="rainTag" hidden>비가 내리는 중 (물 뿌리기)</div>
@@ -193,10 +251,12 @@ header h1 span { color: var(--soil); }
         <button type="button" id="viewAuto">자동 시점</button>
         <button type="button" id="viewZone">위험 사면 보기</button>
         <button type="button" id="viewAll">전체 보기</button>
+        <button type="button" id="viewQ">화질: 높음</button>
         <span class="hint" id="viewHint">끌기: 회전 · 휠: 확대 · 오른쪽 끌기(또는 Shift+끌기): 이동 · 더블클릭: 처음 시점</span>
       </div>
       <div class="ov cap">경기도 광주시 남한산성 일대를 단순하게 표현한 모식도예요 (실제 지형·위치와 다름)</div>
       <div class="ov dmg" id="dmg" hidden>피해 주택 0채</div>
+      <div class="ov evac" id="evac" hidden>주민 대피 중</div>
     </div>
     <div class="side">
       <div class="card buddy" id="buddy">
@@ -206,10 +266,9 @@ header h1 span { color: var(--soil); }
             <g class="x arm-down" stroke="#8f6337" stroke-width="7" stroke-linecap="round" fill="none"><path d="M18 72 q-12 4 -16 14"/><path d="M102 72 q12 4 16 14"/></g>
             <g class="x arm-up" stroke="#8f6337" stroke-width="7" stroke-linecap="round" fill="none"><path d="M20 62 q-14 -6 -18 -20"/><path d="M100 62 q14 -6 18 -20"/></g>
             <g class="x arm-wave" stroke="#8f6337" stroke-width="7" stroke-linecap="round" fill="none"><path d="M18 72 q-12 4 -16 14"/><g class="wv"><path d="M100 62 q14 -6 18 -20"/></g></g>
-            <path d="M60 30 L60 21" stroke="#4a8f43" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <path d="M60 23 C57 14 49 9 41 11 C45 19 52 23 60 23 Z" fill="#6cbf5f"/>
-            <path d="M60 23 C63 13 72 7 81 9 C77 19 69 23 60 23 Z" fill="#5aae4f"/>
             <path d="M8 93 C12 53 34 29 60 29 C86 29 108 53 112 93 Z" fill="#b8834c" stroke="#8f6337" stroke-width="2"/>
+            <g class="helmet"><path d="M30 41 C30 25 43 17 60 17 C77 17 90 25 90 41 Z" fill="#ffc21a" stroke="#a86f00" stroke-width="2"/><path d="M46 21 Q43 30 43 41 M74 21 Q77 30 77 41" stroke="#e09a00" stroke-width="2.4" fill="none"/><path d="M37 31 Q42 22 51 19.5" stroke="#fff4c8" stroke-width="3" stroke-linecap="round" fill="none" opacity=".75"/><path d="M19 43 Q60 34 101 43 Q102 47 98 48 Q60 40 22 48 Q18 47 19 43 Z" fill="#ffb000" stroke="#a86f00" stroke-width="1.6"/><circle cx="60" cy="31" r="5.2" fill="#fff"/><path d="M60 27.6 v6.8 M56.6 31 h6.8" stroke="#2fa35a" stroke-width="2.4"/><circle class="hlamp" cx="60" cy="31" r="5.6" fill="#ff3b30" stroke="#7a0d08" stroke-width="1"/></g>
+            <g class="sprout" transform="translate(0,-9)"><path d="M60 29 L60 21" stroke="#4a8f43" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M60 23 C57 14 49 9 41 11 C45 19 52 23 60 23 Z" fill="#6cbf5f"/><path d="M60 23 C63 13 72 7 81 9 C77 19 69 23 60 23 Z" fill="#5aae4f"/></g>
             <g fill="#9c6c3d"><circle cx="28" cy="84" r="2.6"/><circle cx="92" cy="80" r="2.1"/><circle cx="74" cy="88" r="2.6"/><circle cx="33" cy="58" r="1.8"/><circle cx="96" cy="66" r="1.5"/></g>
             <ellipse class="cheek" cx="36" cy="71" rx="6.5" ry="3.8" fill="#f29a88" opacity=".85"/>
             <ellipse class="cheek" cx="84" cy="71" rx="6.5" ry="3.8" fill="#f29a88" opacity=".85"/>
@@ -333,7 +392,7 @@ header h1 span { color: var(--soil); }
   setInterval(function () {
     var on = Date.now() - D.lastMsg < 5000, c = $("cLink");
     c.textContent = on ? "실시간 연결됨" : "1번 화면 기다리는 중";
-    c.className = on ? "chip" : "chip off";
+    c.className = on ? "chip live" : "chip off";
   }, 1000);
 
   var lastMood = "";
@@ -343,6 +402,13 @@ header h1 span { color: var(--soil); }
     $("cName").textContent = st.name || "–";
     if (st.mood !== lastMood) { lastMood = st.mood; $("mascot").setAttribute("data-mood", st.mood || "sleepy"); }
     $("say").textContent = st.say || "";
+    try {
+      var lv = "0", done = !st.running && st.phase === "done";
+      if (st.running) lv = st.phase === "baseline" ? "c" : st.col != null ? "4" : st.pre != null ? "3" : (st.ratio || 0) >= 0.5 ? "2" : "1";
+      else if (done) lv = st.col != null ? "4" : st.pre != null ? "3" : "0";
+      if (document.body.getAttribute("data-lv") !== lv) { document.body.setAttribute("data-lv", lv); $("lvName").textContent = { "0": "대기", c: "보정", "1": "관심", "2": "주의", "3": "경계", "4": "심각" }[lv]; }
+      if (done) document.body.setAttribute("data-done", "1"); else document.body.removeAttribute("data-done");
+    } catch (e) {}
     var bd = $("buddy"); if (st.tone) bd.setAttribute("data-tone", st.tone); else bd.removeAttribute("data-tone");
     $("vLead").textContent = st.lead != null ? st.lead.toFixed(1) + "초" : "–";
     $("vPre").textContent = fmtT(st.pre);
@@ -407,9 +473,10 @@ header h1 span { color: var(--soil); }
     (opt.series || []).forEach(function (s) {
       if (!s.xs.length) return;
       c.strokeStyle = s.color; c.lineWidth = s.width || 3; c.lineJoin = "round"; c.lineCap = "round"; c.setLineDash(s.dash || []);
+      c.shadowColor = s.color; c.shadowBlur = 8;
       c.beginPath();
       for (var k = 0; k < s.xs.length; k++) { var px = X(s.xs[k]), py = Y(s.ys[k]); if (k) c.lineTo(px, py); else c.moveTo(px, py); }
-      c.stroke(); c.setLineDash([]);
+      c.stroke(); c.setLineDash([]); c.shadowBlur = 0;
       if (s.dots) { c.fillStyle = s.color; for (var q = 0; q < s.xs.length; q++) { c.beginPath(); c.arc(X(s.xs[q]), Y(s.ys[q]), 3, 0, 7); c.fill(); } }
     });
     c.fillStyle = ink; c.textAlign = "left"; c.textBaseline = "top"; c.fillText(opt.yUnit || "", 4, 0);
@@ -517,10 +584,11 @@ header h1 span { color: var(--soil); }
   try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { drawCharts(); themeFog(); }); } catch (e) {}
 
   // =====================================================================
-  // 3D 경기도 광주시 산사태 모식도
+  // 3D 경기도 광주시 산사태 모식도 (고화질: 그림자 · 폭풍우 · 번개 · 진흙 흐름 · 주민 대피)
   // =====================================================================
   var T3 = null;
   var ZONE = { cx: 14, cz: 30, rx: 9, rz: 6.5, depth: 3.6 };
+  var SHELTER = { x: 32, z: 63 };
   function river(x) { return 74 + 7 * Math.sin(x / 22); }
   function hash(i, j) { var s = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return s - Math.floor(s); }
   function vnoise(x, z) {
@@ -549,24 +617,108 @@ header h1 span { color: var(--soil); }
   }
   function zoneQ(x, z) { var a = (x - ZONE.cx) / ZONE.rx, b = (z - ZONE.cz) / ZONE.rz; return a * a + b * b; }
   function scarAt(x, z) { var q = zoneQ(x, z); return q < 1 ? ZONE.depth * Math.pow(1 - q, 1.4) : 0; }
-  function hCur(x, z) { return baseH(x, z) - (T3 ? scarAt(x, z) * T3.scarP : 0); }
+  // 지형 격자 높이를 그대로 읽어 빠르게 계산 (흙더미가 보이는 땅 위에 정확히 놓이도록)
+  var HF = null;
+  function hBase(x, z) {
+    if (!HF) return baseH(x, z);
+    var N = HF.N, fx = (x + HF.half) / HF.step, fz = (z + HF.half) / HF.step;
+    if (!(fx >= 0)) fx = 0; else if (fx > N - 0.0001) fx = N - 0.0001;
+    if (!(fz >= 0)) fz = 0; else if (fz > N - 0.0001) fz = N - 0.0001;
+    var i = fx | 0, j = fz | 0, u = fx - i, v = fz - j, W = N + 1, h = HF.h, o = j * W + i;
+    return (h[o] * (1 - u) + h[o + 1] * u) * (1 - v) + (h[o + W] * (1 - u) + h[o + W + 1] * u) * v;
+  }
+  function hCur(x, z) { return hBase(x, z) - (T3 ? scarAt(x, z) * T3.scarP : 0); }
+  function lin(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
+  function rnd(seed) { var s = seed; return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 
-  function makeLabel(text, bg, fg) {
-    var cv = document.createElement("canvas"); cv.width = 512; cv.height = 128;
-    var c = cv.getContext("2d");
-    c.font = "56px " + css("--font-display");
-    var w = Math.min(500, c.measureText(text).width + 60);
-    c.fillStyle = bg; c.beginPath();
-    var x = (512 - w) / 2, y = 20, h = 88, r = 40;
-    c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r); c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r); c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.fill();
-    c.fillStyle = fg; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(text, 256, 66);
-    var tex = new THREE.CanvasTexture(cv);
-    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
-    sp.scale.set(22, 5.5, 1); sp.renderOrder = 10;
+  // ---------- 그림 재료 (캔버스로 직접 그림) ----------
+  function cvs(w, h) { var c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+  function texOf(cv, srgb, rep) {
+    var t = new THREE.CanvasTexture(cv);
+    if (srgb) t.encoding = THREE.sRGBEncoding;
+    if (rep) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep[0], rep[1]); }
+    return t;
+  }
+  function noiseCanvas(size, lo, hi, seed) {
+    var cv = cvs(size, size), c = cv.getContext("2d"), R = rnd(seed), img = c.createImageData(size, size), d = img.data;
+    for (var i = 0; i < size * size; i++) { var v = lo + (hi - lo) * R(); d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = v; d[i * 4 + 3] = 255; }
+    c.putImageData(img, 0, 0);
+    return cv;
+  }
+  function softDot(size, inner) {
+    var cv = cvs(size, size), c = cv.getContext("2d"), g = c.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(inner || 0.25, "rgba(255,255,255,0.55)"); g.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = g; c.fillRect(0, 0, size, size);
+    return cv;
+  }
+  function cloudCanvas() {
+    var S = 512, cv = cvs(S, S), c = cv.getContext("2d"), R = rnd(31);
+    for (var k = 0; k < 140; k++) {
+      var x = R() * S, y = R() * S, r = 30 + R() * 90, a = 0.05 + R() * 0.12;
+      for (var ox = -S; ox <= S; ox += S) for (var oy = -S; oy <= S; oy += S) {
+        var g = c.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
+        g.addColorStop(0, "rgba(255,255,255," + a + ")"); g.addColorStop(1, "rgba(255,255,255,0)");
+        c.fillStyle = g; c.beginPath(); c.arc(x + ox, y + oy, r, 0, Math.PI * 2); c.fill();
+      }
+    }
+    return cv;
+  }
+  function facadeCanvas(lit, cols, rows, wall, seed) {
+    var cv = cvs(128, 256), c = cv.getContext("2d"), R = rnd(seed);
+    c.fillStyle = lit ? "#000" : wall; c.fillRect(0, 0, 128, 256);
+    var cw = 128 / cols, rh = 256 / rows;
+    for (var j = 0; j < rows; j++) for (var i = 0; i < cols; i++) {
+      var on = R() < 0.55, warm = R() < 0.7;
+      if (lit) { if (on) { c.fillStyle = warm ? "#ffcf86" : "#fff0c8"; c.fillRect(i * cw + cw * 0.18, j * rh + rh * 0.22, cw * 0.64, rh * 0.5); } }
+      else { c.fillStyle = on ? "#c8a96a" : "#2c3846"; c.fillRect(i * cw + cw * 0.18, j * rh + rh * 0.22, cw * 0.64, rh * 0.5); }
+    }
+    if (!lit) { c.fillStyle = "rgba(0,0,0,0.12)"; for (j = 0; j < rows; j++) c.fillRect(0, j * rh + rh * 0.8, 128, 2); }
+    return cv;
+  }
+  function roadCanvas() {
+    var cv = cvs(64, 256), c = cv.getContext("2d"), R = rnd(77);
+    c.fillStyle = "#2a2d31"; c.fillRect(0, 0, 64, 256);
+    for (var k = 0; k < 900; k++) { var v = 30 + R() * 30; c.fillStyle = "rgb(" + v + "," + v + "," + (v + 3) + ")"; c.fillRect(R() * 64, R() * 256, 1, 1); }
+    c.fillStyle = "#d9d9d2"; c.fillRect(3, 0, 3, 256); c.fillRect(58, 0, 3, 256);
+    c.fillStyle = "#f0b323"; c.fillRect(30, 20, 4, 90); c.fillRect(30, 148, 4, 90);
+    return cv;
+  }
+  function fieldCanvas() {
+    var cv = cvs(256, 160), c = cv.getContext("2d");
+    c.fillStyle = "#3f7a3a"; c.fillRect(0, 0, 256, 160);
+    c.strokeStyle = "#a8523a"; c.lineWidth = 22; c.beginPath();
+    c.moveTo(80, 30); c.lineTo(176, 30); c.arc(176, 80, 50, -Math.PI / 2, Math.PI / 2); c.lineTo(80, 130); c.arc(80, 80, 50, Math.PI / 2, Math.PI * 1.5); c.stroke();
+    c.strokeStyle = "rgba(255,255,255,0.8)"; c.lineWidth = 1.5;
+    [-7, 0, 7].forEach(function (o) { c.beginPath(); c.moveTo(80, 30 + o); c.lineTo(176, 30 + o); c.arc(176, 80, 50 - o, -Math.PI / 2, Math.PI / 2); c.lineTo(80, 130 - o); c.arc(80, 80, 50 - o, Math.PI / 2, Math.PI * 1.5); c.stroke(); });
+    return cv;
+  }
+
+  // ---------- 이름표 ----------
+  function makeLabel(text, accent, scale) {
+    var cv = cvs(1024, 256), c = cv.getContext("2d");
+    var font = css("--font-display");
+    c.font = "96px " + font;
+    var tw = c.measureText(text).width, w = Math.min(1000, tw + 120), x = (1024 - w) / 2, y = 40, h = 150, r = 24;
+    c.fillStyle = "rgba(7, 11, 16, 0.86)";
+    c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r); c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r); c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.closePath(); c.fill();
+    c.lineWidth = 5; c.strokeStyle = accent; c.stroke();
+    c.fillStyle = accent; c.fillRect(x + 14, y + 22, 12, h - 44);
+    c.fillStyle = "#ffffff"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(text, 512 + 14, y + h / 2 + 6);
+    var tex = texOf(cv, true);
+    try { tex.anisotropy = T3 ? T3.aniso : 1; } catch (e) {}
+    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true, toneMapped: false, fog: false }));
+    var s = scale || 1;
+    sp.scale.set(24 * s, 6 * s, 1); sp.renderOrder = 10;
     return sp;
   }
-  function rnd(seed) { var s = seed; return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
+  function addLeader(x, z, top, color) {
+    var y0 = baseH(x, z);
+    var g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x, y0, z), new THREE.Vector3(x, top, z)]);
+    var l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.55, toneMapped: false }));
+    T3.scene.add(l);
+    return l;
+  }
 
   // ---------- 3D 시점 조종 (마우스·터치) ----------
   var VIEW_ZONE = { r: 62, tx: ZONE.cx, ty: 9, tz: ZONE.cz + 4, th: 0.35, el: 0.42 };
@@ -582,7 +734,7 @@ header h1 span { color: var(--soil); }
   function setViewMode(m) {
     if (!T3) return;
     T3.view.mode = m;
-    $("viewAuto").style.boxShadow = m === "auto" ? "inset 0 0 0 2px " + css("--accent") : "";
+    $("viewAuto").classList.toggle("on", m === "auto");
   }
   function gotoView(g) { if (!T3) return; T3.view.goal = g; T3.view.since = performance.now(); setViewMode("goto"); }
   function userInput() { if (!T3) return; T3.view.lastInput = performance.now(); if (T3.view.mode !== "manual") setViewMode("manual"); }
@@ -643,246 +795,522 @@ header h1 span { color: var(--soil); }
     $("viewAuto").addEventListener("click", function () { setViewMode("auto"); });
     $("viewZone").addEventListener("click", function () { gotoView(VIEW_ZONE); });
     $("viewAll").addEventListener("click", function () { gotoView(VIEW_ALL); });
+    $("viewQ").addEventListener("click", function () { QUAL.auto = false; setQuality(QUAL.level === "high" ? "low" : "high"); try { localStorage.setItem("solvay-q3d", QUAL.level); } catch (e) {} });
     setViewMode("auto");
+  }
+
+  // ---------- 화질 (느린 컴퓨터는 자동으로 그림자를 끔) ----------
+  var QUAL = { level: "high", auto: true };
+  try { var qv = localStorage.getItem("solvay-q3d"); if (qv === "high" || qv === "low") { QUAL.level = qv; QUAL.auto = false; } } catch (e) {}
+  function setQuality(level) {
+    QUAL.level = level === "low" ? "low" : "high";
+    var b = $("viewQ"); if (b) b.textContent = "화질: " + (QUAL.level === "high" ? "높음" : "보통");
+    if (!T3) return;
+    try {
+      var hi = QUAL.level === "high";
+      T3.renderer.setPixelRatio(hi ? Math.min(window.devicePixelRatio || 1, 1.6) : 1);
+      T3.renderer.shadowMap.enabled = hi; T3.sun.castShadow = hi;
+      T3.scene.traverse(function (o) { if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { m.needsUpdate = true; }); } });
+      resize3D();
+    } catch (e) {}
   }
 
   function init3D() {
     if (!window.THREE) { $("fail").hidden = false; $("viewbar").hidden = true; return; }
     try {
       var canvas = $("gl");
-      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+      renderer.setClearColor(0x0b1118, 1);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      var aniso = 1; try { aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy()); } catch (e) {}
+      // 그래픽 카드 없이 CPU로 3D를 그리는 컴퓨터면(드라이버 문제 등) 지형·나무를 줄여 아주 가볍게 → 1번 화면 카메라 분석을 방해하지 않도록
+      var SOFT = false;
+      try {
+        var gl = renderer.getContext(), ext = gl.getExtension("WEBGL_debug_renderer_info");
+        var rn = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : "";
+        if (/swiftshader|llvmpipe|software|basic render/i.test(rn)) { SOFT = true; QUAL.level = "low"; QUAL.auto = false; }
+      } catch (e) {}
       var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(42, 1.6, 1, 900);
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x7a6a4a, 0.78));
-      var sun = new THREE.DirectionalLight(0xffffff, 0.78); sun.position.set(-60, 120, 80); scene.add(sun);
+      var camera = new THREE.PerspectiveCamera(40, 1.6, 0.8, 1400);
+      var M = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), SC = new THREE.Vector3(), E = new THREE.Euler();
+
+      // 하늘 (맑은 오후 → 폭풍우 → 경보의 붉은 하늘)
+      var sunPos = new THREE.Vector3(-80, 70, 120);
+      var skyU = { top: { value: new THREE.Color() }, hor: { value: new THREE.Color() }, sunDir: { value: sunPos.clone().normalize() }, sunAmt: { value: 1 }, flash: { value: 0 } };
+      var sky = new THREE.Mesh(new THREE.SphereGeometry(650, 40, 20), new THREE.ShaderMaterial({
+        uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
+        vertexShader: "varying vec3 vW;\nvoid main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }",
+        fragmentShader: "uniform vec3 top; uniform vec3 hor; uniform vec3 sunDir; uniform float sunAmt; uniform float flash; varying vec3 vW;\n" +
+          "void main() {\n vec3 d = normalize(vW - cameraPosition); float h = d.y;\n vec3 c = mix(hor, top, pow(clamp(h, 0.0, 1.0), 0.5));\n if (h < 0.0) c = hor * (1.0 + h * 0.5);\n" +
+          " float s = max(dot(d, sunDir), 0.0);\n c += sunAmt * (vec3(1.0, 0.75, 0.45) * pow(s, 400.0) * 8.0 + vec3(1.0, 0.55, 0.25) * pow(s, 6.0) * 0.28);\n" +
+          " c += flash * vec3(0.7, 0.76, 1.0) * (0.35 + 0.65 * clamp(h * 2.5, 0.0, 1.0));\n gl_FragColor = vec4(c, 1.0);\n" +
+          "#include <tonemapping_fragment>\n#include <encodings_fragment>\n}"
+      }));
+      sky.frustumCulled = false; sky.renderOrder = -10; scene.add(sky);
+      scene.fog = new THREE.Fog(0x8899aa, 170, 460);
+
+      // 빛
+      var hemi = new THREE.HemisphereLight(0xcfe0ff, 0x4a3a28, 0.6); scene.add(hemi);
+      var sun = new THREE.DirectionalLight(0xffe0b0, 2.4); sun.position.copy(sunPos);
+      sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+      var shc = sun.shadow.camera; shc.left = -115; shc.right = 115; shc.top = 115; shc.bottom = -115; shc.near = 10; shc.far = 420;
+      sun.shadow.bias = -0.0008; if ("normalBias" in sun.shadow) sun.shadow.normalBias = 0.05;
+      scene.add(sun); scene.add(sun.target);
+      var flashL = new THREE.DirectionalLight(0xdfe8ff, 0); flashL.position.set(30, 160, -40); scene.add(flashL);
+      var alarmL = new THREE.PointLight(0xff2a10, 0, 70, 1.6); alarmL.position.set(ZONE.cx, baseH(ZONE.cx, ZONE.cz) + 12, ZONE.cz + 6); scene.add(alarmL);
 
       // 지형
-      var N = 150, SIZE = 200;
+      var N = SOFT ? 100 : 200, SIZE = 200, step = SIZE / N, W = N + 1;
       var geo = new THREE.PlaneGeometry(SIZE, SIZE, N, N); geo.rotateX(-Math.PI / 2);
-      var pos = geo.attributes.position, cnt = pos.count;
-      var colors = new Float32Array(cnt * 3), base = new Float32Array(cnt * 3);
-      var zoneIdx = [];
-      var cA = new THREE.Color(), cB = new THREE.Color();
-      var stops = [[-1.8, "#c9b98f"], [0.2, "#b9d98a"], [3, "#93c46a"], [12, "#6aa84f"], [26, "#4f8a3e"], [40, "#8e8d7c"]];
-      for (var i = 0; i < cnt; i++) {
-        var x = pos.getX(i), z = pos.getZ(i), h = baseH(x, z);
-        pos.setY(i, h);
-        var k = 0; while (k < stops.length - 2 && h > stops[k + 1][0]) k++;
-        var t = Math.max(0, Math.min(1, (h - stops[k][0]) / (stops[k + 1][0] - stops[k][0])));
-        cA.set(stops[k][1]); cB.set(stops[k + 1][1]); cA.lerp(cB, t);
-        var jit = (hash(i, 7) - 0.5) * 0.05;
-        base[i * 3] = cA.r + jit; base[i * 3 + 1] = cA.g + jit; base[i * 3 + 2] = cA.b + jit;
-        colors[i * 3] = base[i * 3]; colors[i * 3 + 1] = base[i * 3 + 1]; colors[i * 3 + 2] = base[i * 3 + 2];
-        if (zoneQ(x, z) < 2.2) zoneIdx.push(i);
+      var pos = geo.attributes.position, cnt = pos.count, hArr = new Float32Array(cnt);
+      HF = null;
+      for (var i = 0; i < cnt; i++) { var hh = baseH(pos.getX(i), pos.getZ(i)); pos.setY(i, hh); hArr[i] = hh; }
+      HF = { N: N, step: step, half: SIZE / 2, h: hArr };
+      geo.computeVertexNormals();
+      var norm = geo.attributes.normal;
+      var colors = new Float32Array(cnt * 3), base = new Float32Array(cnt * 3), zoneIdx = [], zLo = cnt, zHi = 0;
+      var C = {
+        sand: lin(0xa89a74), bank: lin(0x5f5a44), village: lin(0x6c7a3e),
+        paddy: [lin(0xc0a04a), lin(0xae8f3f), lin(0x8a9440), lin(0x6f8737), lin(0x9b8150), lin(0xb59b5a)],
+        grass: lin(0x587a32), forest: [lin(0x1f3f1c), lin(0x274b22), lin(0x30562a), lin(0x2a4a1f)],
+        autumn: [lin(0x6e5524), lin(0x6a4420), lin(0x7d6a2c), lin(0x5e3a1c)], rock: lin(0x6a655d), peak: lin(0x8f897e)
+      };
+      var cc = new THREE.Color();
+      for (i = 0; i < cnt; i++) {
+        var x = pos.getX(i), z = pos.getZ(i), h = hArr[i], slope = 1 - norm.getY(i);
+        var inVillage = z > 36 && z < 68 && x > -42 && x < 50;
+        if (h < 0.1) cc.copy(C.sand).lerp(C.bank, Math.max(0, Math.min(1, (h + 1) / 1.1)) * 0.6);
+        else if (h < 2.6 && slope < 0.09) {
+          if (inVillage) cc.copy(C.village);
+          else {
+            var px = (x + 300) / 7.5, pz = (z + 300) / 5.2, pi = Math.floor(px), pj = Math.floor(pz);
+            cc.copy(C.paddy[Math.floor(hash(pi, pj) * 6) % 6]);
+            if (px - pi < 0.07 || pz - pj < 0.09) cc.multiplyScalar(0.7);
+          }
+        } else {
+          cc.copy(C.forest[Math.floor(hash(Math.round(x * 0.8), Math.round(z * 0.8)) * 4) % 4]);
+          var lowT = Math.max(0, Math.min(1, (h - 2.6) / 3.5));
+          cc.lerp(inVillage ? C.village : C.grass, 1 - lowT);
+          if (h > 7 && fbm(x * 0.05 + 40, z * 0.05 - 11) > 1.24) cc.lerp(C.autumn[Math.floor(hash(Math.round(x * 0.5), Math.round(z * 0.5)) * 4) % 4], 0.45);
+          var rk = Math.max(0, Math.min(1, (slope - 0.38) * 3)) + Math.max(0, Math.min(1, (h - 33) / 10));
+          cc.lerp(C.rock, Math.min(1, rk));
+          if (h > 41) cc.lerp(C.peak, Math.min(1, (h - 41) / 6));
+        }
+        cc.multiplyScalar(0.88 + hash(i, 3) * 0.24);
+        base[i * 3] = colors[i * 3] = cc.r; base[i * 3 + 1] = colors[i * 3 + 1] = cc.g; base[i * 3 + 2] = colors[i * 3 + 2] = cc.b;
+        if (zoneQ(x, z) < 2.2) { zoneIdx.push(i); if (i < zLo) zLo = i; if (i > zHi) zHi = i; }
       }
       geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-      geo.computeVertexNormals();
-      var terrain = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }));
+      var detail = texOf(noiseCanvas(256, 175, 255, 7), true, [48, 48]); detail.anisotropy = aniso;
+      var bumpT = texOf(noiseCanvas(256, 0, 255, 9), false, [60, 60]);
+      var terrMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.94, metalness: 0, map: detail, bumpMap: bumpT, bumpScale: 0.35 });
+      var terrain = new THREE.Mesh(geo, terrMat); terrain.receiveShadow = true; terrain.castShadow = true;
       scene.add(terrain);
 
       // 경안천 물
-      var water = new THREE.Mesh(new THREE.PlaneGeometry(SIZE, SIZE), new THREE.MeshLambertMaterial({ color: 0x5aa9e6, transparent: true, opacity: 0.85 }));
-      water.rotation.x = -Math.PI / 2; water.position.y = -0.9; scene.add(water);
+      var wBump = texOf(noiseCanvas(128, 0, 255, 13), false, [24, 24]);
+      var waterMat = new THREE.MeshStandardMaterial({ color: lin(0x23506c), roughness: 0.08, metalness: 0, transparent: true, opacity: 0.9, bumpMap: wBump, bumpScale: 0.12 });
+      var water = new THREE.Mesh(new THREE.PlaneGeometry(SIZE, SIZE), waterMat);
+      water.rotation.x = -Math.PI / 2; water.position.y = -0.85; water.receiveShadow = true; scene.add(water);
+      var waterBase = waterMat.color.clone(), waterMud = lin(0x5b4526);
 
-      // 나무
-      var R = rnd(42), trees = [], treeGeo = new THREE.ConeGeometry(1.15, 3.4, 6); treeGeo.translate(0, 1.7, 0);
-      for (var n = 0; n < 4000 && trees.length < 900; n++) {
-        var tx = (R() - 0.5) * 190, tz = (R() - 0.5) * 190, th = baseH(tx, tz);
-        if (th < 2.5) continue;
-        if (tz > 36 && tz < 68 && tx > -22 && tx < 50) continue;
-        trees.push({ x: tx, z: tz, s: 0.75 + R() * 0.6, zone: zoneQ(tx, tz) < 1.1 });
+      // 구름 (폭풍우일수록 짙어짐)
+      var cloudT = texOf(cloudCanvas(), true, [2.2, 2.2]);
+      var cloudMat = new THREE.MeshBasicMaterial({ map: cloudT, transparent: true, opacity: 0.2, depthWrite: false, color: 0xffffff });
+      var clouds = new THREE.Mesh(new THREE.PlaneGeometry(1500, 1500), cloudMat);
+      clouds.rotation.x = Math.PI / 2; clouds.position.y = 140; clouds.renderOrder = -5; scene.add(clouds);
+
+      // 도로 (경안천을 따라)
+      var rp = [], ruv = [], rix = [], dist = 0, prev = null;
+      for (var rx = -98; rx <= 98; rx += 2) {
+        var rzc = river(rx) - 5.2, dz = (7 / 22) * Math.cos(rx / 22), ln = Math.hypot(1, dz), nx = -dz / ln, nz = 1 / ln;
+        if (prev) dist += Math.hypot(rx - prev[0], rzc - prev[1]);
+        prev = [rx, rzc];
+        for (var sd = -1; sd <= 1; sd += 2) {
+          var px2 = rx + nx * 1.7 * sd, pz2 = rzc + nz * 1.7 * sd;
+          rp.push(px2, Math.max(-0.45, baseH(px2, pz2)) + 0.14, pz2); ruv.push(sd < 0 ? 0 : 1, dist / 7);
+        }
       }
-      var treeMesh = new THREE.InstancedMesh(treeGeo, new THREE.MeshLambertMaterial({ color: 0x3f7d3a }), trees.length);
-      var M = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), SC = new THREE.Vector3(), E = new THREE.Euler();
-      trees.forEach(function (tr, j) {
-        tr.x0 = tr.x; tr.z0 = tr.z; tr.vx = 0; tr.vz = 0; tr.tilt = 0; tr.moving = false;
-        V.set(tr.x, baseH(tr.x, tr.z) - 0.2, tr.z); SC.set(tr.s, tr.s, tr.s); Q.identity();
-        M.compose(V, Q, SC); treeMesh.setMatrixAt(j, M);
-      });
-      scene.add(treeMesh);
+      for (var ri = 0; ri < rp.length / 6 - 1; ri++) { var a0 = ri * 2; rix.push(a0, a0 + 1, a0 + 2, a0 + 1, a0 + 3, a0 + 2); }
+      var roadGeo = new THREE.BufferGeometry();
+      roadGeo.setAttribute("position", new THREE.Float32BufferAttribute(rp, 3)); roadGeo.setAttribute("uv", new THREE.Float32BufferAttribute(ruv, 2));
+      roadGeo.setIndex(rix); roadGeo.computeVertexNormals();
+      var roadT = texOf(roadCanvas(), true); roadT.wrapT = THREE.RepeatWrapping; roadT.anisotropy = aniso;
+      var road = new THREE.Mesh(roadGeo, new THREE.MeshStandardMaterial({ map: roadT, roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+      road.receiveShadow = true; scene.add(road);
+      // 가로등 불빛
+      var lampP = [];
+      for (var lx = -94; lx <= 94; lx += 8) { var lz = river(lx) - 7.4; lampP.push(lx, Math.max(-0.3, baseH(lx, lz)) + 1.6, lz); }
+      var lampGeo = new THREE.BufferGeometry(); lampGeo.setAttribute("position", new THREE.Float32BufferAttribute(lampP, 3));
+      var lampMat = new THREE.PointsMaterial({ map: texOf(softDot(64, 0.2), true), color: 0xffc070, size: 2.6, transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
+      scene.add(new THREE.Points(lampGeo, lampMat));
 
-      // 마을과 학교
+      // 나무 (침엽수 · 활엽수, 가을 단풍 조금)
+      var pineGeo = new THREE.LatheGeometry([[0.05, 1.0], [1.35, 1.35], [0.55, 2.25], [1.05, 2.4], [0.42, 3.3], [0.72, 3.45], [0.02, 4.7]].map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 6);
+      var leafGeo = new THREE.IcosahedronGeometry(1.35, 1); leafGeo.scale(1, 0.85, 1); leafGeo.translate(0, 2.55, 0);
+      var trunkGeo = new THREE.CylinderGeometry(0.14, 0.22, 1.7, 5, 1, true); trunkGeo.translate(0, 0.85, 0);
+      var R = rnd(42), trees = [], nType = [0, 0];
+      for (var n = 0; n < 9000 && trees.length < (SOFT ? 350 : 1400); n++) {
+        var tx = (R() - 0.5) * 192, tz = (R() - 0.5) * 192, th2 = baseH(tx, tz);
+        if (th2 < 2.6) continue;
+        if (tz > 34 && tz < 70 && tx > -42 && tx < 52) continue;
+        var autumn = th2 > 7 && fbm(tx * 0.05 + 40, tz * 0.05 - 11) > 1.24;
+        var type = (autumn ? R() < 0.6 : R() < 0.3) ? 1 : 0;
+        trees.push({ x: tx, z: tz, s: 0.7 + R() * 0.65, zone: zoneQ(tx, tz) < 1.1, type: type, fi: nType[type]++, ry: R() * 6.28, autumn: autumn });
+      }
+      var trunkMesh = new THREE.InstancedMesh(trunkGeo, new THREE.MeshStandardMaterial({ color: lin(0x4a3322), roughness: 0.9 }), trees.length);
+      var folMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, flatShading: true });
+      var fol = [new THREE.InstancedMesh(pineGeo, folMat, Math.max(1, nType[0])), new THREE.InstancedMesh(leafGeo, folMat, Math.max(1, nType[1]))];
+      var tcol = new THREE.Color(), pineC = [lin(0x1c3a1d), lin(0x234724), lin(0x2b5129)], leafC = [lin(0x3c6a2a), lin(0x4b7a30), lin(0x335c24)], autC = [lin(0x9a6a24), lin(0x8a5a22), lin(0xa88a34), lin(0x6e7a2a)];
+      trees.forEach(function (tr) {
+        var pal = tr.type === 0 ? pineC : (tr.autumn ? autC : leafC);
+        tcol.copy(pal[Math.floor(R() * pal.length) % pal.length]).multiplyScalar(0.85 + R() * 0.3);
+        fol[tr.type].setColorAt(tr.fi, tcol);
+        tr.x0 = tr.x; tr.z0 = tr.z; tr.vx = 0; tr.vz = 0; tr.tilt = 0; tr.moving = false;
+      });
+      fol.forEach(function (m) { if (m.instanceColor) m.instanceColor.needsUpdate = true; m.castShadow = true; m.receiveShadow = true; scene.add(m); });
+      trunkMesh.castShadow = true; scene.add(trunkMesh);
+
+      // 마을 (집 · 아파트 · 학교 대피소)
+      var winMat = new THREE.MeshBasicMaterial({ color: 0xffc878, toneMapped: false });
+      var winOff = new THREE.MeshBasicMaterial({ color: 0x14181d });
+      var roofShape = new THREE.Shape(); roofShape.moveTo(-2.05, 0); roofShape.lineTo(2.05, 0); roofShape.lineTo(0, 1.45); roofShape.lineTo(-2.05, 0);
+      var roofGeo = new THREE.ExtrudeGeometry(roofShape, { depth: 3.9, bevelEnabled: false }); roofGeo.translate(0, 0, -1.95);
+      var bodyGeo = new THREE.BoxGeometry(3.4, 2.4, 3.4), winGeo = new THREE.BoxGeometry(0.75, 0.62, 0.06), doorGeo = new THREE.BoxGeometry(0.7, 1.2, 0.06);
+      var roofMats = [0x8c2f2a, 0x3d5a7a, 0x2f6a5a, 0x3a3d42, 0x9a5a2a].map(function (c) { return new THREE.MeshStandardMaterial({ color: lin(c), roughness: 0.7 }); });
+      var doorMat = new THREE.MeshStandardMaterial({ color: lin(0x5a3a22), roughness: 0.8 });
+      var wallCols = [0xf1e6d2, 0xe6dccb, 0xf4efe6, 0xd9cdb8];
       var houses = [], R2 = rnd(7);
-      var roofCols = [0xe0675a, 0x5a8fd6, 0xf0a640, 0x7cbf6a, 0xd97aa8];
-      var wallCols = [0xfff4e2, 0xf6efe6, 0xfdf8ef];
       for (var hx = -14; hx <= 40; hx += 6.5) for (var hz = 40; hz <= 62; hz += 6.5) {
         var x2 = hx + (R2() - 0.5) * 2.5, z2 = hz + (R2() - 0.5) * 2.5;
-        if (z2 > river(x2) - 7) continue;
-        if (x2 > 24 && x2 < 40 && z2 > 50) continue; // 학교 자리
+        if (z2 > river(x2) - 8) continue;
+        if (x2 > 22 && x2 < 44 && z2 > 48) continue; // 학교 자리
         var grp = new THREE.Group();
-        var bodyMat = new THREE.MeshLambertMaterial({ color: wallCols[houses.length % wallCols.length] });
-        var body = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.2, 3.2), bodyMat); body.position.y = 1.1; grp.add(body);
-        var roof = new THREE.Mesh(new THREE.ConeGeometry(2.7, 1.7, 4), new THREE.MeshLambertMaterial({ color: roofCols[houses.length % roofCols.length] }));
-        roof.position.y = 3.05; roof.rotation.y = Math.PI / 4; grp.add(roof);
+        var bodyMat = new THREE.MeshStandardMaterial({ color: lin(wallCols[houses.length % wallCols.length]), roughness: 0.85 });
+        var body = new THREE.Mesh(bodyGeo, bodyMat); body.position.y = 1.2; body.castShadow = true; body.receiveShadow = true; grp.add(body);
+        var roof = new THREE.Mesh(roofGeo, roofMats[houses.length % roofMats.length]); roof.position.y = 2.4; roof.castShadow = true; grp.add(roof);
+        var wins = [];
+        [[-0.85, 1.3, 1.72], [0.85, 1.3, 1.72], [-0.85, 1.3, -1.72], [0.85, 1.3, -1.72]].forEach(function (p) { var w = new THREE.Mesh(winGeo, winMat); w.position.set(p[0], p[1], p[2]); grp.add(w); wins.push(w); });
+        [[1.72, 1.3, 0]].forEach(function (p) { var w = new THREE.Mesh(winGeo, winMat); w.position.set(p[0], p[1], p[2]); w.rotation.y = Math.PI / 2; grp.add(w); wins.push(w); });
+        var door = new THREE.Mesh(doorGeo, doorMat); door.position.set(0, 0.6, 1.72); grp.add(door);
         grp.position.set(x2, baseH(x2, z2), z2); grp.rotation.y = (R2() - 0.5) * 0.6;
         scene.add(grp);
-        houses.push({ g: grp, mat: bodyMat, base: bodyMat.color.clone(), hit: false, k: 0, x: x2, z: z2, y0: grp.position.y });
+        houses.push({ g: grp, mat: bodyMat, base: bodyMat.color.clone(), hit: false, k: 0, x: x2, z: z2, y0: grp.position.y, wins: wins });
       }
+      var aptWall = texOf(facadeCanvas(false, 6, 16, "#c9c3b6", 3), true), aptLit = texOf(facadeCanvas(true, 6, 16, "", 3), true);
+      var aptMat = new THREE.MeshStandardMaterial({ map: aptWall, emissiveMap: aptLit, emissive: 0xffffff, emissiveIntensity: 0.3, roughness: 0.8 });
+      var apts = [];
+      [[-34, 44], [-26, 48], [-34, 54], [-26, 58]].forEach(function (p, k) {
+        var hgt = 16 + k * 2.5, ab = new THREE.Mesh(new THREE.BoxGeometry(6, hgt, 6), aptMat);
+        ab.position.set(p[0], Math.min(baseH(p[0] - 3, p[1] - 3), baseH(p[0] + 3, p[1] + 3), baseH(p[0], p[1])) + hgt / 2 - 0.3, p[1]);
+        ab.castShadow = true; ab.receiveShadow = true; scene.add(ab); apts.push(ab);
+        var top = new THREE.Mesh(new THREE.BoxGeometry(6.3, 0.5, 6.3), new THREE.MeshStandardMaterial({ color: lin(0x3a3f46), roughness: 0.8 }));
+        top.position.set(p[0], ab.position.y + hgt / 2 + 0.25, p[1]); scene.add(top);
+      });
       var school = new THREE.Group();
-      var sb = new THREE.Mesh(new THREE.BoxGeometry(13, 4.5, 6), new THREE.MeshLambertMaterial({ color: 0xffffff })); sb.position.y = 2.25; school.add(sb);
-      var sr = new THREE.Mesh(new THREE.BoxGeometry(13.6, 0.6, 6.6), new THREE.MeshLambertMaterial({ color: 0x3f8f4a })); sr.position.y = 4.8; school.add(sr);
-      var field = new THREE.Mesh(new THREE.BoxGeometry(12, 0.2, 8), new THREE.MeshLambertMaterial({ color: 0xc9a46a })); field.position.set(0, 0.1, 8); school.add(field);
+      var schWall = texOf(facadeCanvas(false, 10, 4, "#e9e4da", 11), true), schLit = texOf(facadeCanvas(true, 10, 4, "", 11), true);
+      schWall.wrapS = schLit.wrapS = THREE.RepeatWrapping; schWall.repeat.set(1, 1);
+      var schMat = new THREE.MeshStandardMaterial({ map: schWall, emissiveMap: schLit, emissive: 0xffffff, emissiveIntensity: 0.3, roughness: 0.85 });
+      var sb = new THREE.Mesh(new THREE.BoxGeometry(17, 6.5, 6), schMat); sb.position.y = 3.25; sb.castShadow = true; sb.receiveShadow = true; school.add(sb);
+      var sr = new THREE.Mesh(new THREE.BoxGeometry(17.6, 0.6, 6.6), new THREE.MeshStandardMaterial({ color: lin(0x2f6a46), roughness: 0.7 })); sr.position.y = 6.8; school.add(sr);
+      var fieldT = texOf(fieldCanvas(), true); fieldT.anisotropy = aniso;
+      var field = new THREE.Mesh(new THREE.BoxGeometry(16, 0.25, 10), [null, null, new THREE.MeshStandardMaterial({ map: fieldT, roughness: 0.95 }), null, null, null].map(function (m) { return m || new THREE.MeshStandardMaterial({ color: lin(0x3f7a3a), roughness: 0.95 }); }));
+      field.position.set(0, 0.12, 9); field.receiveShadow = true; school.add(field);
+      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 7, 6), new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.6, roughness: 0.4 })); pole.position.set(-8, 3.5, 4); school.add(pole);
       school.position.set(32, baseH(32, 54), 54); scene.add(school);
 
-      // 위험 사면 테두리
-      var ringPts = [];
-      for (var a = 0; a <= 64; a++) {
-        var an = a / 64 * Math.PI * 2, rx = ZONE.cx + Math.cos(an) * ZONE.rx * 1.05, rzz = ZONE.cz + Math.sin(an) * ZONE.rz * 1.05;
-        ringPts.push(new THREE.Vector3(rx, baseH(rx, rzz) + 0.35, rzz));
+      // 주민 (전조 경보가 울리면 학교 대피소로 이동)
+      var PEOPLE = 40, pplGeo = new THREE.CylinderGeometry(0.28, 0.28, 1.15, 6); pplGeo.translate(0, 0.58, 0);
+      var ppl = new THREE.InstancedMesh(pplGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, emissive: 0x331a00 }), PEOPLE);
+      var pplC = [lin(0xff7a1a), lin(0xffd21a), lin(0xf2f2f2), lin(0x3ec5ff)], people = [], R5 = rnd(21);
+      for (var pp = 0; pp < PEOPLE; pp++) {
+        var hsr = houses[pp % Math.max(1, houses.length)];
+        var ox = hsr ? hsr.x + (R5() - 0.5) * 5 : (R5() - 0.5) * 40, oz = hsr ? hsr.z + 2.2 + R5() * 1.5 : 50;
+        people.push({ x0: ox, z0: oz, x: ox, z: oz, sp: 2.4 + R5() * 1.6, tx: SHELTER.x + (R5() - 0.5) * 11, tz: SHELTER.z + (R5() - 0.5) * 6, delay: R5() * 1.8, done: false });
+        ppl.setColorAt(pp, pplC[pp % pplC.length]);
       }
-      var ringMat = new THREE.LineBasicMaterial({ color: 0xffd34d, transparent: true, opacity: 0.95 });
+      if (ppl.instanceColor) ppl.instanceColor.needsUpdate = true;
+      ppl.castShadow = true; ppl.frustumCulled = false; scene.add(ppl);
+
+      // 위험 사면: 테두리선 + 빛나는 경계막 + 갈라짐
+      var ringPts = [];
+      for (var a = 0; a <= 72; a++) {
+        var an = a / 72 * Math.PI * 2, rx3 = ZONE.cx + Math.cos(an) * ZONE.rx * 1.06, rz3 = ZONE.cz + Math.sin(an) * ZONE.rz * 1.06;
+        ringPts.push(new THREE.Vector3(rx3, baseH(rx3, rz3) + 0.3, rz3));
+      }
+      var ringMat = new THREE.LineBasicMaterial({ color: 0xffc21a, transparent: true, opacity: 1, toneMapped: false });
       var ring = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(ringPts), ringMat);
       scene.add(ring);
+      var cp = [], cuv = [], cix = [];
+      for (a = 0; a <= 72; a++) {
+        var p0 = ringPts[a];
+        cp.push(p0.x, p0.y - 0.2, p0.z, p0.x, p0.y + 7.5, p0.z); cuv.push(a / 72, 0, a / 72, 1);
+        if (a < 72) { var b0 = a * 2; cix.push(b0, b0 + 1, b0 + 2, b0 + 1, b0 + 3, b0 + 2); }
+      }
+      var curGeo = new THREE.BufferGeometry();
+      curGeo.setAttribute("position", new THREE.Float32BufferAttribute(cp, 3)); curGeo.setAttribute("uv", new THREE.Float32BufferAttribute(cuv, 2)); curGeo.setIndex(cix);
+      var curU = { col: { value: new THREE.Color(1, 0.7, 0.1) }, op: { value: 0.35 }, time: { value: 0 } };
+      var curtain = new THREE.Mesh(curGeo, new THREE.ShaderMaterial({
+        uniforms: curU, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false,
+        vertexShader: "varying vec2 vUv;\nvoid main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+        fragmentShader: "uniform vec3 col; uniform float op; uniform float time; varying vec2 vUv;\nvoid main() {\n float a = pow(1.0 - vUv.y, 1.8);\n" +
+          " float scan = 0.55 + 0.45 * step(0.55, fract(vUv.y * 9.0 - time * 0.8));\n float base = smoothstep(0.0, 0.04, vUv.y) * (1.0 + 2.0 * (1.0 - smoothstep(0.0, 0.12, vUv.y)));\n" +
+          " gl_FragColor = vec4(col * (a * scan * op * base), 1.0);\n}"
+      }));
+      curtain.renderOrder = 5; scene.add(curtain);
+      // 갈라짐 (전조 때 위쪽 가장자리에 금이 생김)
+      var crP = [], crI = [], R6 = rnd(55), vi = 0;
+      for (var ck = 0; ck < 4; ck++) {
+        var a1 = -Math.PI / 2 + (ck - 1.5) * 0.42 + (R6() - 0.5) * 0.15, len = 0.5 + R6() * 0.35, rr = 0.74 + R6() * 0.12, segs = 9;
+        for (var cs = 0; cs <= segs; cs++) {
+          var ang = a1 - len / 2 + len * cs / segs, rj = rr + (R6() - 0.5) * 0.06;
+          var cxp = ZONE.cx + Math.cos(ang) * ZONE.rx * rj, czp = ZONE.cz + Math.sin(ang) * ZONE.rz * rj;
+          var wdt = 0.08 + 0.22 * Math.sin(Math.PI * cs / segs), nxp = Math.cos(ang), nzp = Math.sin(ang);
+          crP.push(cxp - nxp * wdt, baseH(cxp - nxp * wdt, czp - nzp * wdt) + 0.07, czp - nzp * wdt, cxp + nxp * wdt, baseH(cxp + nxp * wdt, czp + nzp * wdt) + 0.07, czp + nzp * wdt);
+          if (cs < segs) crI.push(vi, vi + 1, vi + 2, vi + 1, vi + 3, vi + 2);
+          vi += 2;
+        }
+      }
+      var crGeo = new THREE.BufferGeometry(); crGeo.setAttribute("position", new THREE.Float32BufferAttribute(crP, 3)); crGeo.setIndex(crI);
+      var crackMat = new THREE.MeshBasicMaterial({ color: 0x120804, transparent: true, opacity: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3, side: THREE.DoubleSide });
+      var cracks = new THREE.Mesh(crGeo, crackMat); scene.add(cracks);
 
       // 비
-      var RAIN = 1400, rainPos = new Float32Array(RAIN * 6), R3 = rnd(99);
+      var RAIN = SOFT ? 900 : 2600, rainPos = new Float32Array(RAIN * 6), R3 = rnd(99);
       for (var r = 0; r < RAIN; r++) {
-        var rx2 = (R3() - 0.5) * 180, rz2 = (R3() - 0.5) * 180, ry = R3() * 90;
-        rainPos.set([rx2, ry, rz2, rx2 + 0.25, ry - 1.8, rz2], r * 6);
+        var rx2 = (R3() - 0.5) * 190, rz2 = (R3() - 0.5) * 190, ry = R3() * 95;
+        rainPos.set([rx2, ry, rz2, rx2 + 0.35, ry - 2.2, rz2 + 0.15], r * 6);
       }
       var rainGeo = new THREE.BufferGeometry(); rainGeo.setAttribute("position", new THREE.BufferAttribute(rainPos, 3));
-      var rain = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fc8f5, transparent: true, opacity: 0.6 }));
+      var rainMat = new THREE.LineBasicMaterial({ color: 0xb4cce6, transparent: true, opacity: 0.5, depthWrite: false });
+      var rain = new THREE.LineSegments(rainGeo, rainMat); rain.frustumCulled = false;
       rain.visible = false; scene.add(rain);
 
-      // 흙더미
-      var DEB = 1700;
-      var debGeo = new THREE.IcosahedronGeometry(0.62, 0);
-      var deb = new THREE.InstancedMesh(debGeo, new THREE.MeshLambertMaterial({ color: 0xffffff }), DEB);
-      var R4 = rnd(5), debCol = [0x8a5a2b, 0x9c6b38, 0x7a4f26, 0xa77b4a, 0x6e6a5e];
-      var P = { x: new Float32Array(DEB), z: new Float32Array(DEB), vx: new Float32Array(DEB), vz: new Float32Array(DEB), s: new Float32Array(DEB), st: new Uint8Array(DEB), rot: new Float32Array(DEB), mu: new Float32Array(DEB) };
-      var tmpC = new THREE.Color();
+      // 번개 줄기
+      var boltPos = new Float32Array(64 * 6), boltGeo = new THREE.BufferGeometry(); boltGeo.setAttribute("position", new THREE.BufferAttribute(boltPos, 3));
+      var boltMat = new THREE.LineBasicMaterial({ color: 0xeef3ff, transparent: true, opacity: 0, toneMapped: false, fog: false, depthWrite: false });
+      var bolt = new THREE.LineSegments(boltGeo, boltMat); bolt.frustumCulled = false; bolt.visible = false; scene.add(bolt);
+
+      // 흙더미 (진흙 · 돌 · 큰 바위 · 부러진 나뭇가지)
+      var DEB = SOFT ? 1000 : 2200;
+      var debGeo = new THREE.IcosahedronGeometry(0.58, 1);
+      var deb = new THREE.InstancedMesh(debGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.62, flatShading: true }), DEB);
+      var R4 = rnd(5), debCol = [lin(0x4a2c14), lin(0x5c3519), lin(0x3a2210), lin(0x6a4220), lin(0x2e1c0c), lin(0x5a5048), lin(0x2a4020)];
+      var P = { x: new Float32Array(DEB), z: new Float32Array(DEB), vx: new Float32Array(DEB), vz: new Float32Array(DEB), s: new Float32Array(DEB), st: new Uint8Array(DEB), rot: new Float32Array(DEB), mu: new Float32Array(DEB), sy: new Float32Array(DEB) };
       for (var q = 0; q < DEB; q++) {
-        tmpC.setHex(debCol[q % debCol.length]); deb.setColorAt(q, tmpC);
-        P.s[q] = 0.6 + R4() * 0.9; P.rot[q] = R4() * 6;
+        var boulder = q % 70 === 0, k2 = boulder ? 5 : (q % 13 === 0 ? 6 : Math.floor(R4() * 5));
+        tcol.copy(debCol[k2]).multiplyScalar(0.8 + R4() * 0.4); deb.setColorAt(q, tcol);
+        P.s[q] = boulder ? 1.8 + R4() * 1.0 : 0.55 + R4() * 0.9; P.sy[q] = 0.55 + R4() * 0.4; P.rot[q] = R4() * 6;
         M.makeScale(0, 0, 0); deb.setMatrixAt(q, M);
       }
       if (deb.instanceColor) deb.instanceColor.needsUpdate = true;
-      deb.frustumCulled = false;
+      deb.frustumCulled = false; deb.castShadow = true; deb.receiveShadow = true; deb.count = 0; // 움직이기 시작한 흙더미만 그림
       scene.add(deb);
 
-      // 먼지
-      var DUST = 450, dustPos = new Float32Array(DUST * 3), dustV = new Float32Array(DUST * 3);
+      // 흙먼지 (짧게만 살짝)
+      var DUST = 320, dustPos = new Float32Array(DUST * 3), dustV = new Float32Array(DUST * 3);
       var dustGeo = new THREE.BufferGeometry(); dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
-      var dustMat = new THREE.PointsMaterial({ color: 0xc8a77a, size: 2.2, transparent: true, opacity: 0, depthWrite: false });
+      var dustMat = new THREE.PointsMaterial({ map: texOf(softDot(64, 0.1), true), color: 0x5a3e24, size: 2.4, transparent: true, opacity: 0, depthWrite: false });
       var dust = new THREE.Points(dustGeo, dustMat); dust.frustumCulled = false; scene.add(dust);
 
       T3 = {
-        renderer: renderer, scene: scene, camera: camera, geo: geo, pos: pos, colors: colors, base: base, zoneIdx: zoneIdx,
-        trees: trees, treeMesh: treeMesh, houses: houses, ring: ring, ringMat: ringMat, rain: rain, rainPos: rainPos,
+        renderer: renderer, scene: scene, camera: camera, geo: geo, pos: pos, norm: norm, colors: colors, base: base, zoneIdx: zoneIdx, zLo: zLo, zHi: zHi, W: W, N: N, step: step,
+        terrMat: terrMat, water: water, waterMat: waterMat, waterBase: waterBase, waterMud: waterMud, wBump: wBump, clouds: clouds, cloudMat: cloudMat, cloudT: cloudT,
+        sky: sky, skyU: skyU, hemi: hemi, sun: sun, flashL: flashL, alarmL: alarmL, lampMat: lampMat, aptMat: aptMat, schMat: schMat, winMat: winMat, winOff: winOff,
+        trees: trees, trunkMesh: trunkMesh, fol: fol, houses: houses, people: people, ppl: ppl, ring: ring, ringMat: ringMat, curtain: curtain, curU: curU, cracks: cracks, crackMat: crackMat,
+        rain: rain, rainPos: rainPos, rainMat: rainMat, bolt: bolt, boltPos: boltPos, boltMat: boltMat,
         deb: deb, P: P, DEB: DEB, dust: dust, dustPos: dustPos, dustV: dustV, dustMat: dustMat, DUST: DUST,
-        M: M, Q: Q, V: V, SC: SC, E: E,
+        mudW: new Float32Array(cnt), mudList: [], mudDirty: [], mudFlag: new Uint8Array(cnt), colLo: cnt, colHi: -1,
+        M: M, Q: Q, V: V, SC: SC, E: E, aniso: aniso, tmpA: new THREE.Color(), tmpB: new THREE.Color(),
+        C: { calmTop: lin(0x2d5c96), calmHor: lin(0xe9c79a), stormTop: lin(0x0b111b), stormHor: lin(0x353f4b), alarmHor: lin(0x6a2216), alarmTop: lin(0x1a0b0a) },
         runId: null, rainOn: false, intensity: 0, preT: null, colT: null, scarP: 0, treated: false, hitCount: 0,
+        storm: 0, wet: 0, flash: 0, flashT: 0, nextBolt: 0, mudWater: 0, zl: "",
         clock: 0, last: performance.now(), shake: 0, camR: 150, camTx: 4, camTy: 6, camTz: 16, th: 0.55, el: 0.56,
-        view: { mode: "auto", lastInput: 0, goal: null }, labels: [], labelsMade: false, shaped: false
+        view: { mode: "auto", lastInput: 0, goal: null }, labels: [], labelsMade: false, shaped: false,
+        perf: { n: 0, sum: 0, t0: 0 }
       };
+      trees.forEach(function (tr, j) { setTreeMatrix(j); });
+      flushTrees();
+      people.forEach(function (p, j) { setPersonMatrix(j); });
+      T3.ppl.instanceMatrix.needsUpdate = true;
       bindViewControls();
+      T3.soft = SOFT;
+      setQuality(QUAL.level);
+      if (SOFT) { try { renderer.setPixelRatio(0.6); } catch (e) {} }
       themeFog();
       resize3D();
       makeLabelsSoon();
       requestAnimationFrame(loop3D);
     } catch (e) {
+      try { console.warn("3D 초기화 실패", e); } catch (x) {}
       T3 = null; $("fail").hidden = false; $("viewbar").hidden = true;
     }
+  }
+  function setTreeMatrix(j) {
+    var t = T3, tr = t.trees[j], M = t.M, V = t.V, Q = t.Q, SC = t.SC, E = t.E;
+    V.set(tr.x, hCur(tr.x, tr.z) - 0.15, tr.z); E.set(tr.tilt, tr.ry, tr.tilt * 0.4); Q.setFromEuler(E); SC.set(tr.s, tr.s, tr.s);
+    M.compose(V, Q, SC); t.trunkMesh.setMatrixAt(j, M); t.fol[tr.type].setMatrixAt(tr.fi, M);
+  }
+  function flushTrees() { var t = T3; t.trunkMesh.instanceMatrix.needsUpdate = true; t.fol[0].instanceMatrix.needsUpdate = true; t.fol[1].instanceMatrix.needsUpdate = true; }
+  function setPersonMatrix(j) {
+    var t = T3, p = t.people[j];
+    t.V.set(p.x, hCur(p.x, p.z), p.z); t.Q.identity(); t.SC.set(1, 1, 1); t.M.compose(t.V, t.Q, t.SC); t.ppl.setMatrixAt(j, t.M);
   }
   function makeLabelsSoon() {
     var done = false;
     function go() {
       if (done || !T3) return; done = true;
       try {
-        var L1 = makeLabel("남한산성", "rgba(255,255,255,0.88)", "#2b3a2c"); L1.position.set(-30, 52, -35);
-        var L2 = makeLabel("경안천", "rgba(90,169,230,0.92)", "#ffffff"); L2.position.set(-40, 6, river(-40));
-        var L3 = makeLabel("광남고 (모식)", "rgba(63,143,74,0.92)", "#ffffff"); L3.position.set(32, 11, 54);
-        var L4 = makeLabel("마을", "rgba(255,255,255,0.88)", "#2b3a2c"); L4.position.set(2, 9, 50);
-        var L5 = makeLabel("산사태 위험 사면", "rgba(232,144,15,0.95)", "#ffffff"); L5.position.set(ZONE.cx, baseH(ZONE.cx, ZONE.cz) + 9, ZONE.cz);
-        [L1, L2, L3, L4, L5].forEach(function (l) { T3.scene.add(l); });
-        T3.zoneLabel = L5;
+        var defs = [
+          ["남한산성", "#9fb0c2", -30, -35, 54, 1],
+          ["경안천", "#3ec5ff", -40, river(-40), 7, 0.9],
+          ["대피소 · 광남고 (모식)", "#2fd27a", 32, 54, 13, 1],
+          ["마을", "#e9eff6", 2, 50, 9, 0.85],
+          ["아파트 단지", "#e9eff6", -30, 51, 27, 0.85]
+        ];
+        defs.forEach(function (d) {
+          var l = makeLabel(d[0], d[1], d[5]); l.position.set(d[2], d[4], d[3]); T3.scene.add(l);
+          addLeader(d[2], d[3], d[4] - 3 * d[5], d[1]);
+        });
+        T3.zoneLeader = addLeader(ZONE.cx, ZONE.cz, baseH(ZONE.cx, ZONE.cz) + 7, "#ffb020");
         T3.labelsMade = true;
-        if (T3.treated) setZoneLabel(true);
+        refreshZoneLabel(true);
       } catch (e) { /* 이름표는 선택 기능 */ }
     }
     try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); } catch (e) {}
     setTimeout(go, 2500);
   }
-  function setZoneLabel(treated) {
-    if (!T3 || !T3.zoneLabel) return;
-    var old = T3.zoneLabel, nl = makeLabel(treated ? "보강한 사면" : "산사태 위험 사면", treated ? "rgba(90,143,214,0.95)" : "rgba(232,144,15,0.95)", "#ffffff");
-    nl.position.copy(old.position); T3.scene.remove(old); T3.scene.add(nl); T3.zoneLabel = nl;
+  function zoneLabelState() {
+    var t = T3;
+    if (t.colT != null) return "col";
+    if (t.preT != null) return "pre";
+    return t.treated ? "treated" : "idle";
   }
-  function themeFog() {
-    if (!T3) return;
-    var c = new THREE.Color(); try { c.setStyle(css("--sky-bottom")); } catch (e) { c.set(0xeef7ff); }
-    T3.scene.fog = new THREE.Fog(c, 170, 360);
+  var ZL = {
+    idle: ["산사태 위험 사면", "#ffb020"], treated: ["보강한 사면 (달걀껍질 EICP)", "#3ec5ff"],
+    pre: ["⚠ 붕괴 전조 · 주민 대피", "#ff6a1a"], col: ["산사태 발생", "#ff3b30"]
+  };
+  function refreshZoneLabel(force) {
+    var t = T3; if (!t || !t.labelsMade) return;
+    var k = zoneLabelState();
+    if (!force && k === t.zl) return;
+    t.zl = k;
+    try {
+      var nl = makeLabel(ZL[k][0], ZL[k][1], k === "pre" || k === "col" ? 1.25 : 1);
+      nl.position.set(ZONE.cx, baseH(ZONE.cx, ZONE.cz) + 10, ZONE.cz);
+      if (t.zoneLabel) { t.scene.remove(t.zoneLabel); try { t.zoneLabel.material.map.dispose(); t.zoneLabel.material.dispose(); } catch (e) {} }
+      t.scene.add(nl); t.zoneLabel = nl;
+      if (t.zoneLeader) t.zoneLeader.material.color.set(ZL[k][1]);
+    } catch (e) {}
   }
+  function setZoneLabel() { refreshZoneLabel(false); }
+  function themeFog() { /* 안개 색은 하늘 상태에 맞춰 매 장면마다 바뀜 */ }
   function resize3D() {
     if (!T3) return;
     var el = $("scene"), w = Math.max(10, el.clientWidth), h = Math.max(10, el.clientHeight);
     T3.renderer.setSize(w, h, false);
     T3.camera.aspect = w / h; T3.camera.updateProjectionMatrix();
   }
+
+  // ---------- 땅 색 (위험 경고색 · 무너진 자리 · 진흙이 흘러간 길) ----------
+  function vColor(i) {
+    var t = T3, b = t.base, col = t.colors, x = t.pos.getX(i), z = t.pos.getZ(i), q = zoneQ(x, z), w;
+    var r = b[i * 3], g = b[i * 3 + 1], bl = b[i * 3 + 2];
+    if (q < 1.15) {
+      if (t.treated && t.colT == null) { w = 0.4; r = r * (1 - w) + 0.03 * w; g = g * (1 - w) + 0.2 * w; bl = bl * (1 - w) + 0.45 * w; }
+      if (t._warn) { w = (0.3 + 0.55 * t._pulse) * Math.min(1, 1.15 - q); r = r * (1 - w) + 1.0 * w; g = g * (1 - w) + 0.18 * w; bl = bl * (1 - w) + 0.02 * w; }
+      if (t.scarP > 0) { var s = Math.min(1, scarAt(x, z) / ZONE.depth * 2.5) * t.scarP; r = r * (1 - s) + 0.13 * s; g = g * (1 - s) + 0.065 * s; bl = bl * (1 - s) + 0.028 * s; }
+    }
+    var m = t.mudW[i];
+    if (m > 0) { w = Math.min(1, m) * 0.94; r = r * (1 - w) + 0.05 * w; g = g * (1 - w) + 0.028 * w; bl = bl * (1 - w) + 0.012 * w; }
+    col[i * 3] = r; col[i * 3 + 1] = g; col[i * 3 + 2] = bl;
+    if (i < t.colLo) t.colLo = i; if (i > t.colHi) t.colHi = i;
+  }
+  function gridNormal(i) {
+    var t = T3, pos = t.pos, W = t.W, N = t.N, ix = i % W, iz = (i / W) | 0;
+    var il = ix > 0 ? i - 1 : i, ir = ix < N ? i + 1 : i, iu = iz > 0 ? i - W : i, id = iz < N ? i + W : i;
+    var nx = (pos.getY(il) - pos.getY(ir)) / ((ir - il) * t.step || t.step), nz = (pos.getY(iu) - pos.getY(id)) / (((id - iu) / W) * t.step || t.step);
+    var l = Math.sqrt(nx * nx + 1 + nz * nz);
+    t.norm.setXYZ(i, nx / l, 1 / l, nz / l);
+  }
+  function flushColors() {
+    var t = T3; if (t.colHi < 0) return;
+    var a = t.geo.attributes.color;
+    a.updateRange.offset = t.colLo * 3; a.updateRange.count = (t.colHi - t.colLo + 1) * 3; a.needsUpdate = true;
+    t.colLo = t.colors.length; t.colHi = -1;
+  }
   function reset3D() {
     var t = T3; if (!t) return;
-    t.preT = null; t.colT = null; t.scarP = 0; t.hitCount = 0; t.shake = 0; t.shaped = true;
+    t.preT = null; t.colT = null; t.scarP = 0; t.hitCount = 0; t.shake = 0; t.shaped = true; t.mudWater = 0;
     for (var q = 0; q < t.DEB; q++) { t.P.st[q] = 0; t.M.makeScale(0, 0, 0); t.deb.setMatrixAt(q, t.M); }
-    t.deb.instanceMatrix.needsUpdate = true;
-    t.trees.forEach(function (tr, j) {
-      tr.x = tr.x0; tr.z = tr.z0; tr.vx = 0; tr.vz = 0; tr.tilt = 0; tr.moving = false;
-      t.V.set(tr.x, baseH(tr.x, tr.z) - 0.2, tr.z); t.SC.set(tr.s, tr.s, tr.s); t.Q.identity(); t.M.compose(t.V, t.Q, t.SC); t.treeMesh.setMatrixAt(j, t.M);
+    t.deb.instanceMatrix.needsUpdate = true; t.deb.count = 0;
+    t.trees.forEach(function (tr, j) { tr.x = tr.x0; tr.z = tr.z0; tr.vx = 0; tr.vz = 0; tr.tilt = 0; tr.moving = false; setTreeMatrix(j); });
+    flushTrees();
+    t.houses.forEach(function (h) {
+      h.hit = false; h.k = 0; h.g.rotation.z = 0; h.g.rotation.x = 0; h.g.position.y = h.y0; h.mat.color.copy(h.base);
+      h.wins.forEach(function (w) { w.material = t.winMat; });
     });
-    t.treeMesh.instanceMatrix.needsUpdate = true;
-    t.houses.forEach(function (h) { h.hit = false; h.k = 0; h.g.rotation.z = 0; h.g.rotation.x = 0; h.g.position.y = h.y0; h.mat.color.copy(h.base); });
+    t.people.forEach(function (p, j) { p.x = p.x0; p.z = p.z0; p.done = false; setPersonMatrix(j); });
+    t.ppl.instanceMatrix.needsUpdate = true;
+    var list = t.mudList; t.mudList = [];
+    for (var k = 0; k < list.length; k++) { t.mudW[list[k]] = 0; t.mudFlag[list[k]] = 0; vColor(list[k]); }
+    t.mudDirty = [];
     updateZoneGeom(0);
-    t.dustMat.opacity = 0;
-    $("dmg").hidden = true;
+    t.dustMat.opacity = 0; t.crackMat.opacity = 0;
+    $("dmg").hidden = true; $("evac").hidden = true;
+    refreshZoneLabel(false);
   }
   function updateZoneGeom(shakeAmp) {
-    var t = T3, pos = t.pos, col = t.colors, b = t.base, now = t.clock;
-    var warn = t.preT != null && t.colT == null;
-    var pulse = warn ? 0.5 + 0.5 * Math.sin(now * 9) : 0;
-    for (var k = 0; k < t.zoneIdx.length; k++) {
-      var i = t.zoneIdx[k], x = pos.getX(i), z = pos.getZ(i), q = zoneQ(x, z);
-      var y = baseH(x, z) - scarAt(x, z) * t.scarP;
+    var t = T3, pos = t.pos, now = t.clock;
+    t._warn = t.preT != null && t.colT == null;
+    t._pulse = t._warn ? 0.5 + 0.5 * Math.sin(now * 9) : 0;
+    var zi = t.zoneIdx, k, i;
+    for (k = 0; k < zi.length; k++) {
+      i = zi[k];
+      var x = pos.getX(i), z = pos.getZ(i), q = zoneQ(x, z);
+      var y = HF.h[i] - scarAt(x, z) * t.scarP;
       if (shakeAmp > 0 && q < 1.2) y += (hash(i, Math.floor(now * 20)) - 0.5) * shakeAmp;
       pos.setY(i, y);
-      var r = b[i * 3], g = b[i * 3 + 1], bl = b[i * 3 + 2];
-      if (q < 1.15) {
-        if (t.treated && t.colT == null) { r = r * 0.6 + 0.35 * 0.4; g = g * 0.6 + 0.55 * 0.4; bl = bl * 0.6 + 0.8 * 0.4; }
-        if (warn) { var w = (0.35 + 0.45 * pulse) * Math.min(1, 1.15 - q); r = r * (1 - w) + 0.95 * w; g = g * (1 - w) + 0.55 * w; bl = bl * (1 - w) + 0.15 * w; }
-        if (t.scarP > 0) { var s = Math.min(1, scarAt(x, z) / ZONE.depth * 2.5) * t.scarP; r = r * (1 - s) + 0.55 * s; g = g * (1 - s) + 0.38 * s; bl = bl * (1 - s) + 0.2 * s; }
-      }
-      col[i * 3] = r; col[i * 3 + 1] = g; col[i * 3 + 2] = bl;
     }
-    pos.needsUpdate = true; t.geo.attributes.color.needsUpdate = true;
-    t.geo.computeVertexNormals();
+    for (k = 0; k < zi.length; k++) { gridNormal(zi[k]); vColor(zi[k]); }
+    var lo = t.zLo, hi = t.zHi;
+    pos.updateRange.offset = lo * 3; pos.updateRange.count = (hi - lo + 1) * 3; pos.needsUpdate = true;
+    t.norm.updateRange.offset = lo * 3; t.norm.updateRange.count = (hi - lo + 1) * 3; t.norm.needsUpdate = true;
   }
   function activateDebris(from, to, spread) {
     var t = T3, P = t.P, R = rnd(Math.floor(Math.random() * 100000) + 1);
     for (var q = from; q < to; q++) {
       var x, z, tries = 0;
       do { x = ZONE.cx + (R() * 2 - 1) * ZONE.rx; z = ZONE.cz + (R() * 2 - 1) * ZONE.rz; tries++; } while (zoneQ(x, z) > 1 && tries < 20);
-      P.x[q] = x; P.z[q] = z; P.vx[q] = (R() - 0.5) * spread; P.vz[q] = (R() - 0.5) * spread; P.st[q] = 1;
-      P.mu[q] = 0.32 + R() * 0.18;
+      P.x[q] = x; P.z[q] = z; P.vx[q] = (R() - 0.5) * spread; P.vz[q] = (R() - 0.5) * spread + spread * 0.3; P.st[q] = 1;
+      P.mu[q] = (q % 70 === 0 ? 0.28 : 0.32) + R() * 0.18;
     }
+    t.deb.count = Math.max(t.deb.count, Math.min(t.DEB, to));
   }
   function startPrecursor() {
     var t = T3; if (!t) return;
     t.preT = t.clock;
     if (t.view.mode !== "auto") gotoView(VIEW_ZONE);
-    activateDebris(0, 40, 0.5);
-    for (var q = 0; q < 40; q++) t.P.mu[q] = 0.55 + Math.random() * 0.2; // 작은 돌만 조금 굴러 내림
+    activateDebris(0, 60, 0.5);
+    for (var q = 0; q < 60; q++) t.P.mu[q] = 0.55 + Math.random() * 0.2; // 작은 돌만 조금 굴러 내림
+    t.people.forEach(function (p) { p.go = t.clock + p.delay; });
+    refreshZoneLabel(false);
   }
   function startCollapse() {
     var t = T3; if (!t) return;
-    t.colT = t.clock; t.shake = 1.4;
-    activateDebris(40, t.DEB, 2);
+    t.colT = t.clock; t.shake = 1.6;
+    activateDebris(60, t.DEB, 2.2);
     t.trees.forEach(function (tr) { if (tr.zone) { tr.moving = true; tr.vx = 0; tr.vz = 0; } });
     for (var d = 0; d < t.DUST; d++) {
       var a = Math.random() * Math.PI * 2, r = Math.random() * ZONE.rx;
       var x = ZONE.cx + Math.cos(a) * r, z = ZONE.cz + Math.sin(a) * r * 0.7;
-      t.dustPos[d * 3] = x; t.dustPos[d * 3 + 1] = baseH(x, z) + Math.random() * 2; t.dustPos[d * 3 + 2] = z;
-      t.dustV[d * 3] = (Math.random() - 0.5) * 6; t.dustV[d * 3 + 1] = 2 + Math.random() * 5; t.dustV[d * 3 + 2] = Math.random() * 7;
+      t.dustPos[d * 3] = x; t.dustPos[d * 3 + 1] = baseH(x, z) + Math.random() * 1.5; t.dustPos[d * 3 + 2] = z;
+      t.dustV[d * 3] = (Math.random() - 0.5) * 5; t.dustV[d * 3 + 1] = 1.5 + Math.random() * 3.5; t.dustV[d * 3 + 2] = Math.random() * 6;
     }
-    t.dustMat.opacity = 0.75;
+    t.dustMat.opacity = 0.3;
+    refreshZoneLabel(false);
   }
   function apply3D(st) {
     var t = T3; if (!t) return;
@@ -890,7 +1318,7 @@ header h1 span { color: var(--soil); }
     t.rainOn = !!st.running && st.phase !== "baseline";
     t.intensity = Math.max(0, Math.min(4, st.ratio != null ? st.ratio : (st.fracThr ? (st.frac || 0) / st.fracThr : 0)));
     var treated = /EICP|혼합|보강/.test(st.cond || "");
-    if (treated !== t.treated) { t.treated = treated; setZoneLabel(treated); t.ringMat.color.setHex(treated ? 0x5a8fd6 : 0xffd34d); t.shaped = true; }
+    if (treated !== t.treated) { t.treated = treated; t.shaped = true; refreshZoneLabel(false); }
     if (st.pre != null && t.preT == null) startPrecursor();
     if (st.col != null && t.colT == null) { if (t.preT == null) startPrecursor(); startCollapse(); }
     $("rainTag").hidden = !t.rainOn;
@@ -912,25 +1340,131 @@ header h1 span { color: var(--soil); }
     P.x[q] = Math.max(-97, Math.min(97, P.x[q] + P.vx[q] * dt)); P.z[q] = Math.max(-97, Math.min(97, P.z[q] + P.vz[q] * dt));
     return Math.hypot(P.vx[q], P.vz[q]);
   }
+  function addMud(x, z, amt) {
+    var t = T3, ix = Math.round((x + HF.half) / t.step), iz = Math.round((z + HF.half) / t.step);
+    for (var dz = -1; dz <= 1; dz++) for (var dx = -1; dx <= 1; dx++) {
+      var gx = ix + dx, gz = iz + dz;
+      if (gx < 0 || gz < 0 || gx > t.N || gz > t.N) continue;
+      var i = gz * t.W + gx, a = (dx === 0 && dz === 0) ? amt : amt * 0.45;
+      if (t.mudW[i] >= 1) continue;
+      t.mudW[i] = Math.min(1, t.mudW[i] + a);
+      if (!t.mudFlag[i]) { t.mudFlag[i] = 1; t.mudList.push(i); }
+      if (t.mudFlag[i] !== 2) { t.mudFlag[i] = 2; t.mudDirty.push(i); }
+    }
+  }
+  function strikeBolt() {
+    var t = T3, bp = t.boltPos, x = (Math.random() - 0.5) * 160, z = -40 - Math.random() * 60, y = 135;
+    if (t.preT != null && Math.random() < 0.5) { x = ZONE.cx + (Math.random() - 0.5) * 50; z = ZONE.cz - 25 - Math.random() * 30; }
+    var gy = Math.max(0, baseH(x, z)), n = 0, cx = x, cz = z;
+    for (var s = 0; s < 24; s++) {
+      var ny = y - (y - gy) * (s + 1) / 24, nx = cx + (Math.random() - 0.5) * 7, nz = cz + (Math.random() - 0.5) * 4;
+      if (s === 23) { nx = x + (Math.random() - 0.5) * 3; nz = z; }
+      bp.set([cx, y - (y - gy) * s / 24, cz, nx, ny, nz], n * 6); n++;
+      if (s % 6 === 3 && n < 60) { var bx = nx + (Math.random() - 0.5) * 16; bp.set([nx, ny, nz, bx, ny - 12, nz + (Math.random() - 0.5) * 6], n * 6); n++; }
+      cx = nx; cz = nz;
+    }
+    for (var k = n; k < 64; k++) bp.set([0, -999, 0, 0, -999, 0], k * 6);
+    t.bolt.geometry.attributes.position.needsUpdate = true;
+    t.flash = 1; t.flashT = t.clock;
+    var dist = Math.hypot(x - t.camTx, z - t.camTz);
+    try { window.dispatchEvent(new CustomEvent("solvay-lightning", { detail: { dist: dist } })); } catch (e) {}
+  }
+  function updateEnv(dt) {
+    var t = T3, C = t.C, A = t.tmpA, B = t.tmpB;
+    var stormGoal = t.rainOn ? (t.preT != null ? 1 : 0.78) : 0;
+    t.storm += (stormGoal - t.storm) * (1 - Math.exp(-dt * (stormGoal > t.storm ? 1.3 : 0.25)));
+    t.wet += ((t.rainOn ? 1 : 0) - t.wet) * (1 - Math.exp(-dt * 0.4));
+    var st = t.storm, alarm = 0;
+    if (t.colT != null) alarm = Math.max(0.45, 1 - (t.clock - t.colT) * 0.15);
+    else if (t.preT != null) alarm = 0.35 + 0.25 * t._pulse;
+    // 번개
+    if (t.rainOn && t.storm > 0.5) {
+      if (!t.nextBolt) t.nextBolt = t.clock + 2 + Math.random() * 4;
+      if (t.clock > t.nextBolt) { strikeBolt(); t.nextBolt = t.clock + (t.preT != null ? 3 + Math.random() * 5 : 6 + Math.random() * 9); }
+    } else t.nextBolt = 0;
+    var since = t.clock - t.flashT, fl = 0;
+    if (t.flash > 0) {
+      fl = since < 0.08 ? 1 : since < 0.16 ? 0.25 : since < 0.24 ? 0.85 : Math.max(0, 0.85 - (since - 0.24) * 2.2);
+      if (fl <= 0) t.flash = 0;
+    }
+    t.bolt.visible = fl > 0.3; t.boltMat.opacity = fl;
+    A.copy(C.calmTop).lerp(C.stormTop, st).lerp(C.alarmTop, alarm * 0.5); t.skyU.top.value.copy(A);
+    B.copy(C.calmHor).lerp(C.stormHor, st).lerp(C.alarmHor, alarm * 0.55); t.skyU.hor.value.copy(B);
+    t.scene.fog.color.copy(B);
+    t.scene.fog.near = 170 - 95 * st; t.scene.fog.far = 470 - 180 * st;
+    t.skyU.sunAmt.value = Math.max(0, 1 - st * 1.2); t.skyU.flash.value = fl;
+    t.sun.intensity = 2.4 * (1 - 0.8 * st);
+    t.hemi.intensity = 0.6 - 0.25 * st + fl * 0.9;
+    t.flashL.intensity = fl * 2.6;
+    t.renderer.toneMappingExposure = 1.1 + fl * 0.35;
+    t.alarmL.intensity = t.colT != null ? Math.max(0, 2.2 - (t.clock - t.colT) * 0.4) * (0.6 + 0.4 * Math.sin(t.clock * 12)) : t.preT != null ? 0.8 + 1.8 * t._pulse : 0;
+    t.cloudMat.opacity = 0.18 + 0.62 * st; t.cloudMat.color.setRGB(1 - 0.72 * st + fl * 0.7, 1 - 0.7 * st + fl * 0.7, 1 - 0.66 * st + fl * 0.8);
+    t.cloudT.offset.x += dt * (0.004 + 0.012 * st); t.cloudT.offset.y += dt * 0.002;
+    var glow = 0.25 + 0.75 * st;
+    t.lampMat.opacity = 0.25 + 0.75 * st;
+    t.aptMat.emissiveIntensity = 0.12 + 0.75 * glow; t.schMat.emissiveIntensity = 0.12 + 0.75 * glow;
+    if (t.preT != null && t.colT == null) t.winMat.color.setHex(t._pulse > 0.5 ? 0xff5a3a : 0xffc878); else t.winMat.color.setHex(0xffc878);
+    t.terrMat.roughness = 0.94 - 0.3 * t.wet; t.terrMat.color.setScalar(1 - 0.18 * t.wet);
+    if (t.colT != null) t.mudWater = Math.min(1, t.mudWater + dt * 0.25);
+    t.waterMat.color.copy(t.waterBase).lerp(t.waterMud, t.mudWater * 0.85);
+    t.wBump.offset.x += dt * 0.02; t.wBump.offset.y += dt * 0.012;
+    t.rainMat.opacity = 0.25 + 0.4 * st;
+  }
   function loop3D(now) {
     var t = T3; if (!t) return;
     requestAnimationFrame(loop3D);
+    // 그래픽 부담을 줄이려고 초당 약 40장(보통 화질은 30장)까지만 그림 → 같은 노트북의 1번 화면 카메라 분석이 느려지지 않게
+    if (now - t.last < (t.soft ? 150 : QUAL.level === "high" ? 22 : 30)) return;
     var rawDt = Math.min(0.25, Math.max(0, (now - t.last) / 1000));
     var dt = Math.min(0.05, rawDt); t.last = now; t.clock += dt;
     var P = t.P, M = t.M, V = t.V, Q = t.Q, SC = t.SC, E = t.E;
+    // 화질 버튼에 초당 장면 수 표시 (집·학교 컴퓨터에서 부드럽게 도는지 확인용)
+    t.fpsN = (t.fpsN || 0) + 1;
+    if (!t.fpsT) t.fpsT = now;
+    if (now - t.fpsT > 2000) {
+      var fps = Math.round(t.fpsN * 1000 / (now - t.fpsT)); t.fpsN = 0; t.fpsT = now;
+      var qb = $("viewQ"); if (qb) qb.textContent = "화질: " + (QUAL.level === "high" ? "높음" : "보통") + " · " + fps + "fps";
+    }
+
+    // 자동 화질: 처음 몇 초 동안 너무 느리면 그림자를 끔
+    if (QUAL.auto && t.perf.n >= 0) {
+      if (t.clock > 1.5) { if (!t.perf.t0) t.perf.t0 = now; t.perf.n++; t.perf.sum += rawDt; }
+      if (t.perf.n >= 120 || (t.perf.t0 && now - t.perf.t0 > 5000 && t.perf.n >= 5)) {
+        var avg = t.perf.sum / t.perf.n;
+        if (QUAL.level === "high" && !t.perf.stage) {
+          if (avg > 0.045) { setQuality("low"); t.perf = { n: 0, sum: 0, t0: 0, stage: 1 }; } else t.perf.n = -1;
+        } else {
+          if (avg > 0.075) { try { t.renderer.setPixelRatio(0.75); resize3D(); } catch (e) {} }
+          t.perf.n = -1;
+        }
+      }
+    }
 
     // 땅 모양 (흔들림, 경고색, 무너진 자리)
     if (t.colT != null && t.scarP < 1) t.scarP = Math.min(1, t.scarP + dt / 1.6);
     var shaking = t.preT != null && t.colT == null;
-    if (shaking || (t.colT != null && t.scarP < 1) || t.shaped || (t.treated && t.colT == null && (t.clock * 10 | 0) % 10 === 0)) {
+    if (shaking || (t.colT != null && t.scarP < 1) || t.shaped) {
       updateZoneGeom(shaking ? 0.12 + 0.12 * Math.min(3, t.intensity) : 0);
       t.shaped = false;
     }
     t.ring.visible = t.colT == null;
-    if (shaking) t.ringMat.color.setHex(Math.sin(t.clock * 9) > 0 ? 0xff7a2f : 0xffd34d);
+    var ringHex = t.treated ? 0x3ec5ff : 0xffc21a;
+    if (shaking) ringHex = Math.sin(t.clock * 9) > 0 ? 0xff3b1a : 0xffb020;
+    t.ringMat.color.setHex(ringHex);
+    // 경계막
+    t.curU.time.value = t.clock;
+    if (t.colT != null) { t.curU.col.value.setRGB(1, 0.12, 0.05); t.curU.op.value = Math.max(0, 1.3 - (t.clock - t.colT) * 0.35); }
+    else if (shaking) { t.curU.col.value.setRGB(1, 0.28 + 0.2 * t._pulse, 0.04); t.curU.op.value = 0.75 + 0.45 * t._pulse; }
+    else if (t.treated) { t.curU.col.value.setRGB(0.15, 0.65, 1); t.curU.op.value = 0.35; }
+    else { t.curU.col.value.setRGB(1, 0.68, 0.08); t.curU.op.value = 0.28 + 0.06 * Math.sin(t.clock * 2); }
+    t.curtain.visible = t.curU.op.value > 0.01;
+    // 갈라짐
+    var crGoal = t.colT != null ? 0 : shaking ? Math.min(1, 0.45 + 0.25 * t.intensity) : 0;
+    t.crackMat.opacity += (crGoal - t.crackMat.opacity) * Math.min(1, dt * 2);
+    t.cracks.visible = t.crackMat.opacity > 0.01;
 
     // 흙더미
-    var anyDeb = false, G = 30;
+    var anyDeb = false, G = 30, mudTick = (t.clock * 30 | 0) % 2;
     for (var q = 0; q < t.DEB; q++) {
       if (P.st[q] === 0) continue;
       anyDeb = true;
@@ -938,6 +1472,7 @@ header h1 span { color: var(--soil); }
       if (P.st[q] === 1) {
         sp = stepParticle(P, q, dt, G);
         P.rot[q] += sp * dt * 0.6;
+        if (sp > 1.2 && (q & 1) === mudTick) addMud(P.x[q], P.z[q], 0.05 * P.s[q]);
         if (sp > 2.2) {
           for (var hI = 0; hI < t.houses.length; hI++) {
             var hs = t.houses[hI];
@@ -946,11 +1481,16 @@ header h1 span { color: var(--soil); }
         }
       }
       var s = P.s[q];
-      V.set(P.x[q], hCur(P.x[q], P.z[q]) + s * 0.45, P.z[q]);
-      E.set(P.rot[q], P.rot[q] * 0.7, 0); Q.setFromEuler(E); SC.set(s, s * 0.8, s);
+      V.set(P.x[q], hCur(P.x[q], P.z[q]) + s * 0.36, P.z[q]);
+      E.set(P.rot[q], P.rot[q] * 0.7, 0); Q.setFromEuler(E); SC.set(s, s * P.sy[q], s);
       M.compose(V, Q, SC); t.deb.setMatrixAt(q, M);
     }
     if (anyDeb) t.deb.instanceMatrix.needsUpdate = true;
+    if (t.mudDirty.length) {
+      for (var md = 0; md < t.mudDirty.length; md++) { var mi = t.mudDirty[md]; t.mudFlag[mi] = 1; vColor(mi); }
+      t.mudDirty = [];
+    }
+    flushColors();
 
     // 위험 사면 나무가 함께 쓸려 내려감
     if (t.colT != null) {
@@ -963,41 +1503,65 @@ header h1 span { color: var(--soil); }
         tr.x += tr.vx * dt; tr.z += tr.vz * dt;
         tr.tilt = Math.min(1.35, tr.tilt + dt * 0.9);
         if (Math.hypot(tr.vx, tr.vz) < 0.2 && t.clock - t.colT > 3) tr.moving = false;
-        V.set(tr.x, hCur(tr.x, tr.z) - 0.2, tr.z); E.set(tr.tilt, 0, tr.tilt * 0.4); Q.setFromEuler(E); SC.set(tr.s, tr.s, tr.s);
-        M.compose(V, Q, SC); t.treeMesh.setMatrixAt(j, M); moved = true;
+        setTreeMatrix(j); moved = true;
       }
-      if (moved) t.treeMesh.instanceMatrix.needsUpdate = true;
+      if (moved) flushTrees();
     }
 
     // 쓸린 집
     t.houses.forEach(function (h) {
       if (!h.hit || h.k >= 1) return;
+      if (h.k === 0) h.wins.forEach(function (w) { w.material = t.winOff; });
       h.k = Math.min(1, h.k + dt * 1.5);
       h.g.rotation.z = 0.32 * h.k; h.g.rotation.x = 0.18 * h.k; h.g.position.y = h.y0 - 0.9 * h.k;
-      h.mat.color.copy(h.base).lerp(new THREE.Color(0x8a6a4a), 0.55 * h.k);
+      h.mat.color.copy(h.base).lerp(t.waterMud, 0.7 * h.k);
     });
     if (t.colT != null) { var dm = $("dmg"); dm.hidden = false; dm.textContent = "피해 주택 " + t.hitCount + "채"; }
 
-    // 먼지
+    // 주민 대피
+    if (t.preT != null) {
+      var walking = 0, arrived = 0;
+      for (var pi = 0; pi < t.people.length; pi++) {
+        var p = t.people[pi];
+        if (p.done) { arrived++; continue; }
+        if (t.clock < p.go) { walking++; continue; }
+        var ddx = p.tx - p.x, ddz = p.tz - p.z, dd = Math.hypot(ddx, ddz);
+        if (dd < 0.4) { p.done = true; arrived++; continue; }
+        var stp = Math.min(dd, p.sp * dt);
+        p.x += ddx / dd * stp + Math.sin(t.clock * 3 + pi) * 0.01; p.z += ddz / dd * stp;
+        setPersonMatrix(pi); walking++;
+      }
+      t.ppl.instanceMatrix.needsUpdate = true;
+      var ev = $("evac");
+      if (t.colT == null) { ev.hidden = false; ev.textContent = "주민 대피 중 · 대피소 도착 " + arrived + "/" + t.people.length + "명"; }
+      else ev.hidden = true;
+    }
+
+    // 흙먼지
     if (t.dustMat.opacity > 0) {
       for (var d = 0; d < t.DUST; d++) {
         t.dustPos[d * 3] += t.dustV[d * 3] * dt; t.dustPos[d * 3 + 1] += t.dustV[d * 3 + 1] * dt; t.dustPos[d * 3 + 2] += t.dustV[d * 3 + 2] * dt;
-        t.dustV[d * 3 + 1] *= (1 - 0.6 * dt);
+        t.dustV[d * 3 + 1] *= (1 - 0.8 * dt);
       }
       t.dust.geometry.attributes.position.needsUpdate = true;
-      t.dustMat.opacity = Math.max(0, t.dustMat.opacity - dt * 0.12);
+      t.dustMat.opacity = Math.max(0, t.dustMat.opacity - dt * 0.2);
     }
 
     // 비
-    t.rain.visible = t.rainOn;
-    if (t.rainOn) {
-      var rp = t.rainPos, fall = 70 * dt;
+    t.rain.visible = t.rainOn || t.storm > 0.2;
+    if (t.rain.visible) {
+      var rp = t.rainPos, fall = 75 * dt, drift = 12 * dt;
       for (var r = 0; r < rp.length; r += 6) {
-        rp[r + 1] -= fall; rp[r + 4] -= fall;
-        if (rp[r + 4] < -1) { var ny = 80 + Math.random() * 15; rp[r + 1] = ny; rp[r + 4] = ny - 1.8; }
+        rp[r + 1] -= fall; rp[r + 4] -= fall; rp[r] += drift; rp[r + 3] += drift;
+        if (rp[r + 4] < -1) {
+          var ny = 85 + Math.random() * 15, nx2 = t.camTx + (Math.random() - 0.5) * 190, nz2 = t.camTz + (Math.random() - 0.5) * 190;
+          rp[r] = nx2; rp[r + 1] = ny; rp[r + 2] = nz2; rp[r + 3] = nx2 + 0.35; rp[r + 4] = ny - 2.2; rp[r + 5] = nz2 + 0.15;
+        }
       }
       t.rain.geometry.attributes.position.needsUpdate = true;
     }
+
+    updateEnv(dt);
 
     // 카메라: 자동이면 천천히 돌다가 전조·붕괴 때 위험 사면으로 다가감. 마우스로 움직이면 직접 조종
     var vw = t.view;
@@ -1013,7 +1577,23 @@ header h1 span { color: var(--soil); }
     var cx = t.camTx + t.camR * Math.cos(el) * Math.sin(th), cy = t.camTy + t.camR * Math.sin(el), cz = t.camTz + t.camR * Math.cos(el) * Math.cos(th);
     if (t.shake > 0) { t.shake = Math.max(0, t.shake - dt); var a = t.shake * 1.2; cx += (Math.random() - 0.5) * a; cy += (Math.random() - 0.5) * a; cz += (Math.random() - 0.5) * a; }
     t.camera.position.set(cx, cy, cz); t.camera.lookAt(t.camTx, t.camTy, t.camTz);
+    t.sky.position.copy(t.camera.position);
     t.renderer.render(t.scene, t.camera);
+    hud3D();
+  }
+  // 장면 위 위험도 표시
+  var HUD3 = { last: "" };
+  function hud3D() {
+    var t = T3, st = D.st || {};
+    var r = Math.max(0, Math.min(2, t.intensity || 0)), pctv = st.running && st.phase === "watch" ? Math.round(r * 50) : 0;
+    if (t.colT != null) pctv = 100;
+    var key = pctv + "|" + (t.colT != null) + "|" + (t.preT != null);
+    if (key === HUD3.last) return;
+    HUD3.last = key;
+    var f = $("riskFill"); if (!f) return;
+    f.style.width = pctv + "%";
+    f.setAttribute("data-lv", t.colT != null ? "4" : t.preT != null ? "3" : pctv >= 25 ? "2" : "1");
+    $("riskV").textContent = t.colT != null ? "붕괴" : pctv + "%";
   }
 
   // =====================================================================
@@ -1109,7 +1689,7 @@ header h1 span { color: var(--soil); }
       for (var k = 0; k < 45; k++) burst(0.06 + Math.random() * 0.08, "bandpass", 1500 + Math.random() * 3000, 0.12 + Math.random() * 0.15, { at: 0.2 + Math.random() * 3, q: 3 });
     },
     house: function () { burst(0.35, "lowpass", 600, 0.5, { at: Math.random() * 0.1 }); tone(140, 0.25, { vol: 0.25, to: 70, type: "triangle" }); burst(0.2, "bandpass", 2400, 0.15, { at: 0.05, q: 4 }); },
-    thunder: function () { burst(2.6, "lowpass", 300, 0.55, { to: 60, atk: 0.15 }); burst(0.3, "bandpass", 1800, 0.12, { atk: 0.005 }); },
+    thunder: function (k) { k = k == null ? 1 : k; burst(2.8, "lowpass", 300, 0.6 * k, { to: 55, atk: 0.12 }); burst(0.35, "bandpass", 1800, 0.14 * k, { atk: 0.005 }); if (k > 0.7) burst(0.12, "highpass", 3000, 0.3 * k, { atk: 0.002 }); },
     bird: function () {
       var b = 2400 + Math.random() * 1200, n = 2 + Math.floor(Math.random() * 3);
       for (var k = 0; k < n; k++) tone(b, 0.09, { vol: 0.05, to: b * 1.35, at: k * 0.14 });
@@ -1175,7 +1755,7 @@ header h1 span { color: var(--soil); }
     if (col && AU.colAt && now - AU.colAt < 6) rumble = Math.max(rumble, 0.35 * (1 - (now - AU.colAt) / 6));
     setLoop("rumble", rumble, 0.5);
     if (!raining && now > AU.nextBird) { SFX.bird(); AU.nextBird = now + 4 + Math.random() * 6; }
-    if (raining && now > AU.nextThunder) { if (AU.nextThunder) SFX.thunder(); AU.nextThunder = now + 18 + Math.random() * 18; }
+    if (!T3 && raining && now > AU.nextThunder) { if (AU.nextThunder) SFX.thunder(); AU.nextThunder = now + 18 + Math.random() * 18; }
     if (!raining) AU.nextThunder = 0;
 
     // 경고음: 위험할수록 빨라지는 삑삑삑 (소리 시계에 0.6초 앞까지 미리 예약해서 타이머가 느려져도 박자가 유지됨)
@@ -1198,6 +1778,12 @@ header h1 span { color: var(--soil); }
     AU.lastTick = now;
   }, 50);
   updateSndBtn();
+  // 3D 화면의 번개에 맞춰 천둥 (멀수록 늦고 작게)
+  window.addEventListener("solvay-lightning", function (e) {
+    if (!AU.on || !AU.ctx) return;
+    var d = (e && e.detail && isFinite(e.detail.dist)) ? e.detail.dist : 80;
+    setTimeout(function () { SFX.thunder(Math.max(0.35, Math.min(1, 1.15 - d / 200))); }, Math.min(2200, 150 + d * 9));
+  });
 
   // ---------- 관람객 앱 QR, 접속한 폰 수 ----------
   (function () {
