@@ -1,0 +1,1746 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SOLVAY 슬로프 워치</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: 1번 화면(실험 조작용) — 위 "지금 할 일"+큰 버튼, 가운데 카메라(왼쪽)+흙돌이·결과(오른쪽), 아래 기록. 그래프와 3D는 display.html(2번 화면) */
+:root {
+  --bg: #eef6ea;
+  --surface: #ffffff;
+  --surface-2: #f5f9f2;
+  --ink: #2b3a2c;
+  --muted: #6b7a6a;
+  --line: #d9e6d2;
+  --accent: #3f8f4a;
+  --accent-soft: #e1f1dc;
+  --accent-ink: #ffffff;
+  --soil: #a8743f;
+  --warn: #e8900f;
+  --warn-soft: #fff1d9;
+  --danger: #e04f3c;
+  --danger-soft: #fde4df;
+  --stage: #1d2a20;
+  --shadow: rgba(63, 110, 55, 0.16);
+  --press: rgba(40, 70, 35, 0.28);
+  --font-display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141c16; --surface: #1d2820; --surface-2: #18221b; --ink: #e6f0e3; --muted: #9fb19c; --line: #2e3d31;
+    --accent: #7fcf87; --accent-soft: #233a27; --accent-ink: #10200f; --soil: #d4a06a;
+    --warn: #f6b64e; --warn-soft: #3a2c12; --danger: #f27461; --danger-soft: #3d1f1a; --stage: #0b100c;
+    --shadow: rgba(0, 0, 0, 0.35); --press: rgba(0, 0, 0, 0.5); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141c16; --surface: #1d2820; --surface-2: #18221b; --ink: #e6f0e3; --muted: #9fb19c; --line: #2e3d31;
+  --accent: #7fcf87; --accent-soft: #233a27; --accent-ink: #10200f; --soil: #d4a06a;
+  --warn: #f6b64e; --warn-soft: #3a2c12; --danger: #f27461; --danger-soft: #3d1f1a; --stage: #0b100c;
+  --shadow: rgba(0, 0, 0, 0.35); --press: rgba(0, 0, 0, 0.5); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px 40px;
+}
+[hidden] { display: none !important; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; }
+.wrap { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.brand h1 { margin: 0; font-size: 28px; line-height: 1.2; color: var(--accent); }
+.brand h1 span { color: var(--soil); }
+.brand p { margin: 0; color: var(--muted); font-size: 14px; }
+.top-r { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; border-radius: 999px; background: var(--surface); padding: 4px; box-shadow: 0 2px 0 var(--shadow); }
+.seg button { box-shadow: none; background: transparent; padding: 7px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.linkpill { font-size: 13px; padding: 5px 12px; border-radius: 999px; background: var(--surface); color: var(--muted); box-shadow: 0 2px 0 var(--shadow); }
+.linkpill.on { background: var(--accent-soft); color: var(--accent); }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+ol.steps li { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); padding: 5px 14px 5px 5px;
+  border-radius: 999px; background: var(--surface); box-shadow: 0 2px 0 var(--shadow); }
+ol.steps li b { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display);
+  font-weight: 400; font-size: 15px; background: var(--surface-2); color: var(--muted); }
+ol.steps li.done { color: var(--ink); }
+ol.steps li.done b { background: var(--accent-soft); color: var(--accent); }
+ol.steps li.now { color: var(--accent-ink); background: var(--accent); font-family: var(--font-display); font-size: 16px; }
+ol.steps li.now b { background: var(--accent-ink); color: var(--accent); }
+
+.cmd { background: var(--surface); border-radius: 24px; padding: 14px 18px; box-shadow: 0 4px 0 var(--shadow);
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; border: 3px solid var(--accent-soft); }
+.cmd[data-tone="warn"] { border-color: var(--warn); background: var(--warn-soft); }
+.cmd[data-tone="danger"] { border-color: var(--danger); background: var(--danger-soft); }
+.cmd .guide { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cmd .k { font-family: var(--font-display); font-size: 15px; color: var(--accent); }
+.cmd[data-tone="warn"] .k { color: var(--warn); }
+.cmd[data-tone="danger"] .k { color: var(--danger); }
+.cmd .t { font-family: var(--font-display); font-size: 26px; line-height: 1.25; text-wrap: balance; }
+.cmd .d { color: var(--muted); font-size: 15px; max-width: 72ch; }
+.cmd[data-tone] .d { color: var(--ink); }
+.notice { font-size: 14px; margin-top: 6px; padding: 6px 12px; border-radius: 12px; background: var(--surface-2); }
+.notice.err { color: var(--danger); background: var(--danger-soft); }
+.cmd .acts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 12px; border-top: 2px dashed var(--line); width: 100%; }
+.tools .lbl { font-size: 14px; color: var(--muted); }
+
+button {
+  font-family: var(--font-display); font-size: 15px; border-radius: 999px; border: 0; background: var(--surface-2);
+  color: var(--ink); padding: 8px 16px; cursor: pointer; line-height: 1.3; box-shadow: 0 3px 0 var(--press);
+  transition: transform .08s, box-shadow .08s;
+}
+button:hover:not(:disabled) { filter: brightness(1.04); }
+button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--press); }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.big { font-size: 21px; padding: 13px 28px; }
+button.primary { background: var(--accent); color: var(--accent-ink); }
+button.stop { background: var(--soil); color: #fff; }
+button.danger { background: var(--danger); color: #fff; }
+button.on { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+select, input[type="number"], input[type="text"], input[type="password"], input[type="email"] {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--surface-2); border: 2px solid var(--line);
+  border-radius: 12px; padding: 6px 10px; min-width: 0;
+}
+input[type="number"] { width: 84px; font-variant-numeric: tabular-nums; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; align-items: start; }
+@media (max-width: 980px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.stage-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.stages { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.stages[data-n="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 1200px) { .stages[data-n="2"] { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border-radius: 22px; overflow: hidden; margin-inline: auto; box-shadow: 0 4px 0 var(--shadow);
+  aspect-ratio: var(--ar, 1.7778); width: min(100%, calc(66vh * var(--ar, 1.7778))); max-width: 100%; }
+.camtag { position: absolute; left: 12px; bottom: 12px; padding: 3px 12px; border-radius: 999px; background: rgba(29, 42, 32, 0.78); color: #fff; font-family: var(--font-display); font-size: 14px; pointer-events: none; }
+.camsel { display: flex; flex-wrap: wrap; gap: 8px; }
+.camsel label.f { min-width: 180px; }
+.stage video, .stage canvas.overlay { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }
+.stage canvas.overlay { touch-action: none; }
+.stage canvas.overlay.drawing { cursor: crosshair; }
+.stage .empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: #c6d6c2; padding: 20px; font-family: var(--font-display); font-size: 20px; }
+.banner { position: absolute; left: 12px; right: 12px; top: 12px; padding: 10px 16px; border-radius: 16px; font-family: var(--font-display);
+  font-size: 22px; color: #fff; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; pointer-events: none; }
+.banner.base { background: rgba(29, 42, 32, 0.84); }
+.banner.pre { background: rgba(232, 144, 15, 0.94); }
+.banner.col { background: rgba(224, 79, 60, 0.95); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--muted); justify-content: center; }
+.legend i { display: inline-block; width: 16px; height: 16px; border-radius: 50%; vertical-align: -3px; margin-right: 5px; }
+
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card { background: var(--surface); border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; box-shadow: 0 4px 0 var(--shadow); }
+.card h2 { margin: 0; font-size: 19px; }
+.buddy { align-items: center; gap: 4px; padding-bottom: 8px; }
+.bubble { position: relative; align-self: stretch; background: var(--surface-2); border-radius: 18px; padding: 10px 14px; text-align: center;
+  font-family: var(--font-display); font-size: 20px; line-height: 1.3; text-wrap: balance; }
+.bubble::after { content: ""; position: absolute; left: 50%; bottom: -10px; margin-left: -10px; border: 10px solid transparent; border-top-color: var(--surface-2); border-bottom: 0; }
+.buddy .mascot { width: min(100%, 230px); margin-top: 8px; }
+.big3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.num { background: var(--surface-2); border-radius: 16px; padding: 8px 12px; min-width: 0; }
+.num .k { font-family: var(--font-display); font-size: 15px; }
+.num .s { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.num .v { font-family: var(--font-display); font-size: 24px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.num.lead { grid-column: span 2; background: var(--accent-soft); }
+.num.lead .v { font-size: 38px; color: var(--accent); line-height: 1.15; }
+.gauge { position: relative; height: 22px; border-radius: 999px; background: var(--surface-2); overflow: hidden; box-shadow: inset 0 2px 0 var(--shadow); }
+.gauge .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--accent); border-radius: 999px; transition: width .2s; }
+.gauge .fill[data-lv="1"] { background: var(--warn); }
+.gauge .fill[data-lv="2"] { background: var(--danger); }
+.gauge .mark { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: var(--ink); opacity: .55; }
+.gscale { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.mini { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 12px; color: var(--muted); }
+.mini b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
+label.f { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--muted); }
+label.f input, label.f select { width: 100%; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.small { font-size: 13px; color: var(--muted); margin: 0; overflow-wrap: anywhere; }
+details summary { cursor: pointer; font-family: var(--font-display); font-size: 16px; }
+details[open] summary { margin-bottom: 10px; }
+label.chk { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 980px) { .lower { grid-template-columns: minmax(0, 1fr); } }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 2px solid var(--surface-2); white-space: nowrap; }
+th { font-size: 13px; color: var(--muted); font-weight: 400; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.empty-row td { color: var(--muted); white-space: normal; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qrmodal { position: fixed; inset: 0; z-index: 40; background: rgba(20, 28, 22, 0.72); display: grid; place-items: center; padding: 20px; }
+.qrbox { background: #ffffff; color: #2b3a2c; border-radius: 26px; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 92vw; }
+.qrbox h2 { margin: 0; font-size: 28px; color: #3f8f4a; }
+.qrbox #qr { background: #fff; padding: 12px; }
+.qrbox #qr img, .qrbox #qr canvas { display: block; width: min(70vw, 360px) !important; height: auto !important; }
+.qrbox .url { font-size: 14px; color: #5a6460; overflow-wrap: anywhere; }
+.howto { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; font-size: 14px; }
+.howto div { min-width: 0; }
+.howto h3 { margin: 0 0 4px; font-size: 17px; color: var(--accent); }
+.howto ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.howto li + li { margin-top: 3px; }
+@media (max-width: 800px) { .howto { grid-template-columns: minmax(0, 1fr); } .cmd .t { font-size: 22px; } }
+
+/* 흙돌이 (표정 11가지) */
+.mascot { display: block; overflow: visible; }
+.mascot .x { display: none; }
+.mascot .mbody { transform-box: fill-box; transform-origin: 50% 100%; }
+.mascot .blink { transform-box: fill-box; transform-origin: center; }
+.mascot .wv { transform-box: fill-box; transform-origin: 0% 100%; }
+.mascot[data-mood="sleepy"] :is(.arm-down, .e-line, .m-small, .zz),
+.mascot[data-mood="ready"] :is(.arm-wave, .e-dot, .m-smile, .spark),
+.mascot[data-mood="hold"] :is(.arm-down, .e-shut, .m-flat),
+.mascot[data-mood="calm"] :is(.arm-down, .e-dot, .m-smile),
+.mascot[data-mood="curious"] :is(.arm-down, .e-side, .br-curious, .m-small, .qmark),
+.mascot[data-mood="worried"] :is(.arm-down, .e-big, .br-worry, .m-o, .sweat),
+.mascot[data-mood="panic"] :is(.arm-up, .e-big, .br-worry, .m-scream, .sweat, .sweat2),
+.mascot[data-mood="collapse"] :is(.arm-down, .e-x, .m-wave, .crack),
+.mascot[data-mood="happy"] :is(.arm-up, .e-happy, .m-big, .spark),
+.mascot[data-mood="proud"] :is(.arm-wave, .e-star, .m-cat, .spark),
+.mascot[data-mood="confused"] :is(.arm-down, .e-swirl, .m-wave, .qmark) { display: inline; }
+.mascot[data-mood="calm"] .mbody { animation: bob 3s ease-in-out infinite; }
+.mascot[data-mood="calm"] .blink, .mascot[data-mood="ready"] .blink { animation: blink 4s infinite; }
+.mascot[data-mood="ready"] .wv, .mascot[data-mood="proud"] .wv { animation: wave .9s ease-in-out infinite; }
+.mascot[data-mood="curious"] .mbody { transform: rotate(5deg); }
+.mascot[data-mood="worried"] .mbody { animation: shake .35s linear infinite; }
+.mascot[data-mood="panic"] .mbody { animation: shake .16s linear infinite; }
+.mascot[data-mood="collapse"] .mbody { transform: rotate(-8deg) translateY(4px); }
+.mascot[data-mood="happy"] .mbody, .mascot[data-mood="proud"] .mbody { animation: hop .7s ease-in-out infinite; }
+.mascot[data-mood="hold"] .cheek { transform-box: fill-box; transform-origin: center; transform: scale(1.45); }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-7px); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px) rotate(-2deg); } 75% { transform: translateX(3px) rotate(2deg); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-25deg); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>SOLVAY <span>슬로프 워치</span></h1>
+      <p>흙 사면의 아주 작은 움직임을 카메라로 잡아 무너지기 전에 알려 줘요</p>
+    </div>
+    <div class="top-r">
+      <span class="linkpill" id="dispPill">2번 화면 연결 안 됨</span>
+      <button type="button" id="openDisplay">2번 화면(그래프·3D) 열기</button>
+      <div class="seg" role="group" aria-label="영상 입력 방식">
+        <button type="button" id="modeCam" aria-pressed="true">실시간 카메라</button>
+        <button type="button" id="modeFile" aria-pressed="false">녹화 영상 분석</button>
+      </div>
+    </div>
+  </header>
+
+  <ol class="steps" id="steps">
+    <li data-s="1"><b>1</b>카메라 켜기</li>
+    <li data-s="2"><b>2</b>감시할 곳 정하기</li>
+    <li data-s="3"><b>3</b>흔들림 학습 (물 X)</li>
+    <li data-s="4"><b>4</b>물 뿌리며 감시</li>
+    <li data-s="5"><b>5</b>결과 기록</li>
+  </ol>
+
+  <div class="cmd" id="cmd">
+    <div class="guide">
+      <div class="k" id="guideK">지금 할 일</div>
+      <div class="t" id="guideT">카메라를 켜 주세요</div>
+      <div class="d" id="guideD">목록에서 카메라를 고르고 ‘카메라 켜기’를 누르세요.</div>
+      <div class="notice" id="notice" hidden></div>
+    </div>
+    <div class="acts">
+      <div class="camsel" id="camSel">
+        <label class="f">카메라 1 · 측면<select id="camSelect0"><option value="">기본 카메라</option></select></label>
+        <label class="f">카메라 2 · 위쪽 (선택)<select id="camSelect1"><option value="">사용 안 함</option></select></label>
+      </div>
+      <input type="file" id="fileInput0" accept="video/*" hidden>
+      <input type="file" id="fileInput1" accept="video/*" hidden>
+      <button type="button" id="collapseBtn" class="big danger" hidden>흙이 무너졌어요!</button>
+      <button type="button" id="saveBtn" class="big" hidden>이 결과 기록하기</button>
+      <button type="button" id="primaryBtn" class="big primary">카메라 켜기</button>
+    </div>
+    <div class="tools" id="tools" hidden>
+      <span class="lbl">준비 (선택):</span>
+      <button type="button" id="toolRoi">감시 영역 그리기</button>
+      <button type="button" id="toolCal">자로 길이 맞추기</button>
+      <label class="lbl" for="calMm">자 두 점 사이</label>
+      <input type="number" id="calMm" value="100" min="1" step="1"><span class="lbl">mm</span>
+      <button type="button" id="resetRoi">처음 상태로</button>
+      <button type="button" id="camOff">카메라 끄기</button>
+      <button type="button" id="fileAgain" hidden>측면 영상 다시 고르기</button>
+      <button type="button" id="fileAdd1" hidden>위쪽 영상 추가 (선택)</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stage-col">
+      <div class="stages" id="stages" data-n="1">
+        <div class="stage" id="stage0">
+          <video id="video0" playsinline muted></video>
+          <canvas class="overlay" id="overlay0" width="1280" height="720"></canvas>
+          <div class="empty" id="empty0">카메라를 켜면 여기에 화면이 나와요</div>
+          <div class="camtag">카메라 1 · 측면</div>
+          <div class="banner base" id="banner" hidden><span id="bannerT"></span><span id="bannerV"></span></div>
+        </div>
+        <div class="stage" id="stage1" hidden>
+          <video id="video1" playsinline muted></video>
+          <canvas class="overlay" id="overlay1" width="1280" height="720"></canvas>
+          <div class="empty" id="empty1">위쪽 카메라</div>
+          <div class="camtag">카메라 2 · 위쪽</div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i style="background:rgba(246,195,67,.9)"></i>살짝 움직임</span>
+        <span><i style="background:rgba(242,120,60,.9)"></i>확실히 움직임</span>
+        <span><i style="background:rgba(205,35,35,.95)"></i>빠르게 무너지는 중</span>
+        <span><i style="background:transparent;box-shadow:inset 0 0 0 3px #7fcf87"></i>감시 영역</span>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card buddy">
+        <div class="bubble" id="say">쿨쿨… 카메라를 켜 주세요</div>
+        <svg class="mascot" id="mascot" viewBox="-14 -10 148 110" data-mood="sleepy" aria-hidden="true">
+          <g class="mbody">
+            <g class="x arm-down" stroke="#8f6337" stroke-width="7" stroke-linecap="round" fill="none"><path d="M18 72 q-12 4 -16 14"/><path d="M102 72 q12 4 16 14"/></g>
+            <g class="x arm-up" stroke="#8f6337" stroke-width="7" stroke-linecap="round" fill="none"><path d="M20 62 q-14 -6 -18 -20"/><path d="M100 62 q14 -6 18 -20"/></g>
+            <g class="x arm-wave" stroke="#8f6337" stroke-width="7" stroke-linecap="round" fill="none"><path d="M18 72 q-12 4 -16 14"/><g class="wv"><path d="M100 62 q14 -6 18 -20"/></g></g>
+            <path d="M60 30 L60 21" stroke="#4a8f43" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M60 23 C57 14 49 9 41 11 C45 19 52 23 60 23 Z" fill="#6cbf5f"/>
+            <path d="M60 23 C63 13 72 7 81 9 C77 19 69 23 60 23 Z" fill="#5aae4f"/>
+            <path d="M8 93 C12 53 34 29 60 29 C86 29 108 53 112 93 Z" fill="#b8834c" stroke="#8f6337" stroke-width="2"/>
+            <g fill="#9c6c3d"><circle cx="28" cy="84" r="2.6"/><circle cx="92" cy="80" r="2.1"/><circle cx="74" cy="88" r="2.6"/><circle cx="33" cy="58" r="1.8"/><circle cx="96" cy="66" r="1.5"/></g>
+            <ellipse class="cheek" cx="36" cy="71" rx="6.5" ry="3.8" fill="#f29a88" opacity=".85"/>
+            <ellipse class="cheek" cx="84" cy="71" rx="6.5" ry="3.8" fill="#f29a88" opacity=".85"/>
+            <g class="x br-worry" stroke="#2f1f12" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M40 50 L51 46"/><path d="M80 50 L69 46"/></g>
+            <g class="x br-curious" stroke="#2f1f12" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M41 51 h9"/><path d="M69 49 q5 -5 11 -2"/></g>
+            <g class="x e-dot"><g class="blink" fill="#2f1f12"><circle cx="46" cy="60" r="4.4"/><circle cx="74" cy="60" r="4.4"/><circle cx="47.5" cy="58.3" r="1.5" fill="#fff"/><circle cx="75.5" cy="58.3" r="1.5" fill="#fff"/></g></g>
+            <g class="x e-line" stroke="#2f1f12" stroke-width="3" stroke-linecap="round" fill="none"><path d="M41 61 h10 M69 61 h10"/></g>
+            <g class="x e-shut" stroke="#2f1f12" stroke-width="3" stroke-linecap="round" fill="none"><path d="M41 59 q5 5 10 0 M69 59 q5 5 10 0"/></g>
+            <g class="x e-big" fill="#2f1f12"><circle cx="46" cy="59" r="6.2"/><circle cx="74" cy="59" r="6.2"/><circle cx="48.3" cy="56.8" r="2.3" fill="#fff"/><circle cx="76.3" cy="56.8" r="2.3" fill="#fff"/></g>
+            <g class="x e-side" fill="#2f1f12"><circle cx="49" cy="60" r="4.4"/><circle cx="77" cy="60" r="4.4"/><circle cx="50.5" cy="58.3" r="1.5" fill="#fff"/><circle cx="78.5" cy="58.3" r="1.5" fill="#fff"/></g>
+            <g class="x e-x" stroke="#2f1f12" stroke-width="3" stroke-linecap="round" fill="none"><path d="M42 55 l8 8 M50 55 l-8 8 M70 55 l8 8 M78 55 l-8 8"/></g>
+            <g class="x e-happy" stroke="#2f1f12" stroke-width="3" stroke-linecap="round" fill="none"><path d="M41 62 q5 -7 10 0 M69 62 q5 -7 10 0"/></g>
+            <g class="x e-star" fill="#f6c343" stroke="#2f1f12" stroke-width="1.4" stroke-linejoin="round"><path d="M46 52 l2.2 4.8 5.2 .6 -3.9 3.5 1.1 5.1 -4.6 -2.6 -4.6 2.6 1.1 -5.1 -3.9 -3.5 5.2 -.6 z"/><path d="M74 52 l2.2 4.8 5.2 .6 -3.9 3.5 1.1 5.1 -4.6 -2.6 -4.6 2.6 1.1 -5.1 -3.9 -3.5 5.2 -.6 z"/></g>
+            <g class="x e-swirl" stroke="#2f1f12" stroke-width="2.2" fill="none"><circle cx="46" cy="60" r="5"/><circle cx="46" cy="60" r="1.6"/><circle cx="74" cy="60" r="5"/><circle cx="74" cy="60" r="1.6"/></g>
+            <path class="x m-smile" d="M53 73 q7 6 14 0" stroke="#2f1f12" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path class="x m-small" d="M56 75 q4 3 8 0" stroke="#2f1f12" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <path class="x m-flat" d="M54 75 h12" stroke="#2f1f12" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <ellipse class="x m-o" cx="60" cy="77" rx="4.2" ry="5.2" fill="#2f1f12"/>
+            <g class="x m-scream"><ellipse cx="60" cy="78" rx="7" ry="9" fill="#2f1f12"/><ellipse cx="60" cy="83" rx="4.2" ry="3" fill="#e2675a"/></g>
+            <path class="x m-wave" d="M49 77 q3 -4 5.5 0 q3 4 5.5 0 q3 -4 5.5 0 q3 4 5.5 0" stroke="#2f1f12" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <path class="x m-big" d="M50 71 q10 13 20 0 z" fill="#2f1f12"/>
+            <path class="x m-cat" d="M51 73 q4.5 5 9 0 q4.5 5 9 0" stroke="#2f1f12" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <path class="x sweat" d="M99 40 q6 9 0 12.5 q-6 -3.5 0 -12.5 z" fill="#7cc4f0"/>
+            <path class="x sweat2" d="M21 44 q5 7 0 10 q-5 -3 0 -10 z" fill="#7cc4f0"/>
+            <g class="x crack" stroke="#6e4826" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M22 92 l6 -10 l-4 -6 l7 -8"/><path d="M99 92 l-5 -9 l5 -7 l-3 -5"/></g>
+            <g class="x zz" fill="#7d8b7a" font-family="Jua, sans-serif"><text x="88" y="28" font-size="14">z</text><text x="99" y="17" font-size="11">z</text></g>
+            <g class="x qmark" fill="#e8900f" font-family="Jua, sans-serif"><text x="96" y="34" font-size="20">?</text></g>
+            <g class="x spark" fill="#f6c343"><path d="M102 28 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2 z"/><path d="M16 34 l1.5 3.5 l3.5 1.5 l-3.5 1.5 l-1.5 3.5 l-1.5 -3.5 l-3.5 -1.5 l3.5 -1.5 z"/></g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="card">
+        <h2>이번 실험 결과</h2>
+        <div class="big3">
+          <div class="num lead"><div class="k">대피 가능 시간</div><div class="s">전조 경보가 울린 뒤 무너질 때까지</div><div class="v" id="roLead">–</div><div class="s" id="roLeadNote" hidden>전조 경보 없이 바로 무너졌어요</div></div>
+          <div class="num"><div class="k">전조 시점</div><div class="s">흙이 움직이기 시작한 때</div><div class="v" id="roPre">–</div></div>
+          <div class="num"><div class="k">붕괴 시점</div><div class="s">흙이 무너진 때</div><div class="v" id="roCol">–</div></div>
+          <div class="num"><div class="k">예측 붕괴 시각</div><div class="s">빨라지는 추세로 계산</div><div class="v" id="roPred">–</div></div>
+          <div class="num"><div class="k">경과 시간</div><div class="s">감시 시작부터</div><div class="v" id="roTime">–</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>지금 움직이는 칸</h2>
+        <div class="gauge" aria-hidden="true"><div class="fill" id="gFill"></div><div class="mark"></div></div>
+        <div class="gscale"><span>조용함</span><span>경보선</span><span>2배 이상</span></div>
+        <div class="mini">
+          <div>측면 움직이는 칸<b id="roFrac0">–</b></div>
+          <div>위쪽 움직이는 칸<b id="roFrac1">–</b></div>
+          <div>속도<b id="roSpeed">–</b></div>
+        </div>
+        <p class="small" id="roThr">경보선: –</p>
+        <p class="small" id="roCum">쌓인 움직임: –</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="lower">
+    <div class="card">
+      <h2>실험 정보</h2>
+      <div class="grid2">
+        <label class="f">조건
+          <select id="condSel">
+            <option>무처리</option><option>달걀껍질 EICP</option><option>시약 EICP</option><option>달걀껍질 가루 혼합</option><option>기타</option>
+          </select>
+        </label>
+        <label class="f">회차 · 카메라
+          <input type="text" id="trialName" value="1회 · 측면">
+        </label>
+      </div>
+      <label class="chk"><input type="checkbox" id="recOn" checked> 감시하는 동안 영상도 녹화해 저장</label>
+      <label class="f" id="rateBox" hidden>영상 재생 속도
+        <select id="rate"><option value="1">1배 (실제 시간)</option><option value="2">2배</option><option value="4">4배</option></select>
+      </label>
+      <p class="small" id="srcInfo">영상이 아직 없어요.</p>
+      <p class="small" id="calOut">길이 단위: 픽셀 (자로 길이를 맞추면 mm로 바뀝니다)</p>
+      <button type="button" id="csvSeries" disabled>이번 실험 시간별 데이터 CSV</button>
+    </div>
+    <div class="card">
+      <details>
+        <summary>감지 설정 (선생님용)</summary>
+        <div class="grid2">
+          <label class="f">흔들림 학습 시간 (초)<input type="number" id="setBase" value="20" min="5" max="300" step="1"></label>
+          <label class="f">민감도 k (작을수록 예민)<input type="number" id="setK" value="3" min="1" max="10" step="0.5"></label>
+          <label class="f">연속 초과 횟수<input type="number" id="setConsec" value="3" min="1" max="20" step="1"></label>
+          <label class="f">빠른 칸 기준 (경보선의 몇 배)<input type="number" id="setFast" value="5" min="2" max="30" step="0.5"></label>
+          <label class="f">붕괴 판정: 빠른 칸 비율 (%)<input type="number" id="setColFrac" value="8" min="1" max="80" step="1"></label>
+          <label class="f">분석 간격 (ms)<input type="number" id="setInterval" value="250" min="100" max="2000" step="50"></label>
+          <label class="f">분석 해상도 (가로 px)<input type="number" id="setRes" value="640" min="320" max="1280" step="80"></label>
+          <label class="f">칸 크기 (px, 작을수록 촘촘·느림)<input type="number" id="setBlock" value="12" min="8" max="40" step="2"></label>
+          <label class="f">탐색 반경 (px)<input type="number" id="setRadius" value="4" min="2" max="10" step="1"></label>
+        </div>
+        <label class="chk" style="margin-top:8px"><input type="checkbox" id="showArrows"> 칸마다 움직인 방향 화살표 표시</label>
+        <p class="small" id="limitHint" style="margin-top:6px"></p>
+        <p class="small" id="perfHint"></p>
+      </details>
+    </div>
+  </div>
+
+  <section class="card" id="cloudCard">
+    <div class="row" style="justify-content:space-between">
+      <h2>관람객 앱 (QR 모의 경보)</h2>
+      <span class="linkpill" id="cloudPill">연결 안 됨</span>
+    </div>
+    <p class="small" id="cloudNote">관리자 계정으로 로그인하면 실험 상황과 전조·붕괴 경보가 관람객 폰으로 실시간 전송돼요.</p>
+    <div class="row" id="loginRow">
+      <input type="email" id="cloudEmail" placeholder="관리자 이메일" autocomplete="username">
+      <input type="password" id="cloudPw" placeholder="비밀번호" autocomplete="current-password">
+      <button type="button" id="cloudLogin">로그인</button>
+    </div>
+    <div class="row" id="cloudActs" hidden>
+      <button type="button" id="qrBtn" class="primary">QR 크게 보기</button>
+      <button type="button" id="testAlert">시험 경보 보내기</button>
+      <button type="button" id="cloudLogout">로그아웃</button>
+      <span class="small" id="viewers"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2>실험 기록</h2>
+      <div class="row">
+        <button type="button" id="csvRuns">기록 CSV 내보내기</button>
+        <button type="button" id="clearRuns">기록 모두 지우기</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>조건</th><th>회차 · 카메라</th><th>날짜</th><th class="n">전조 (s)</th><th class="n">붕괴 (s)</th>
+          <th class="n">대피 가능 시간 (s)</th><th class="n">예측 붕괴 (s)</th><th class="n">최대 쌓인 움직임</th><th class="n">길이 단위</th><th></th>
+        </tr></thead>
+        <tbody id="runBody"></tbody>
+      </table>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>조건</th><th class="n">횟수</th><th class="n">대피 가능 시간 평균 ± 표준편차 (s)</th><th class="n">전조 시점 평균 (s)</th><th class="n">붕괴 시점 평균 (s)</th></tr></thead>
+        <tbody id="sumBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>화면 보는 법</h2>
+    <div class="howto">
+      <div>
+        <h3>판정 방법</h3>
+        <ul>
+          <li>카메라마다 감시 영역을 작은 칸 약 1,000개로 나누고, 칸마다 흙 무늬가 옮겨 간 거리를 1픽셀보다 작은 단위까지 잽니다.</li>
+          <li>흔들림 학습 동안 카메라 잡음이 만드는 가짜 움직임의 크기를 재고, 그보다 확실히 큰 움직임만 ‘움직이는 칸’으로 셉니다.</li>
+          <li>움직이는 칸 비율이 경보선을 넘으면 전조, 아주 빠른 칸이 일정 비율 이상이면 붕괴로 판정해요.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>버튼</h3>
+        <ul>
+          <li><b>흙이 무너졌어요!</b>: 흙덩이가 미끄러지는 걸 눈으로 본 순간 누르세요. 누르지 않으면 프로그램이 자동 판정합니다.</li>
+          <li><b>대피 가능 시간</b> = 붕괴 시점 − 전조 시점. 처리한 흙이 이 시간을 늘리는지 비교하는 것이 실험의 핵심이에요.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>모니터 두 대로 전시하기</h3>
+        <ul>
+          <li>1번 모니터: 이 화면 (카메라 1~2대로 실험 감시). 카메라 2대를 쓰면 측면·위쪽 중 먼저 움직임을 잡은 쪽 기준으로 전조와 붕괴를 판정해요.</li>
+          <li>카메라 2대 연결 예: 아이폰(연속성 카메라) + 노트북 웹캠, 또는 아이폰 2대에 Camo·Iriun 앱 설치</li>
+          <li>2번 모니터: ‘2번 화면 열기’로 열리는 창을 옮기고 F11. 실시간 그래프와 경기도 광주시 3D 산사태 모식도가 실험과 함께 움직여요.</li>
+          <li>두 창은 같은 노트북, 같은 브라우저에서 열려 있어야 이어집니다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="qrmodal" id="qrModal" hidden>
+  <div class="qrbox">
+    <h2>폰으로 산사태 경보 받기</h2>
+    <div id="qr"></div>
+    <div class="url" id="qrUrl"></div>
+    <button type="button" id="qrClose">닫기</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- 움직임 계산 엔진 (작업 스레드와 본 화면이 같은 코드를 씀) ----------
+  function engineFactory() {
+    function sadAt(prev, cur, aw, bx, by, B, dx, dy, limit) {
+      var s = 0, j, i, pr, cr, d;
+      for (j = 0; j < B; j++) {
+        pr = (by + j) * aw + bx; cr = (by + j + dy) * aw + bx + dx;
+        for (i = 0; i < B; i++) { d = prev[pr + i] - cur[cr + i]; s += d < 0 ? -d : d; }
+        if (s >= limit) return s;
+      }
+      return s;
+    }
+    // 블록이 다음 장면에서 어디로 옮겨 갔는지 찾고, 포물선 보간으로 1픽셀보다 작은 이동까지 구한다.
+    function matchBlock(prev, cur, aw, bx, by, B, R, texMin) {
+      var n = B * B, sum = 0, sum2 = 0, i, j, v;
+      for (j = 0; j < B; j++) { var rowP = (by + j) * aw + bx; for (i = 0; i < B; i++) { v = prev[rowP + i]; sum += v; sum2 += v * v; } }
+      var mean = sum / n, variance = sum2 / n - mean * mean;
+      if (!(variance >= texMin)) return null;
+      var best = sadAt(prev, cur, aw, bx, by, B, 0, 0, Infinity), bdx = 0, bdy = 0, dx, dy, s;
+      for (dy = -R; dy <= R; dy++) for (dx = -R; dx <= R; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        s = sadAt(prev, cur, aw, bx, by, B, dx, dy, best);
+        if (s < best) { best = s; bdx = dx; bdy = dy; }
+      }
+      var sx = 0, sy = 0, l, r, den;
+      if (bdx > -R && bdx < R) {
+        l = sadAt(prev, cur, aw, bx, by, B, bdx - 1, bdy, Infinity); r = sadAt(prev, cur, aw, bx, by, B, bdx + 1, bdy, Infinity);
+        den = l - 2 * best + r; if (den > 0) sx = Math.max(-0.5, Math.min(0.5, 0.5 * (l - r) / den));
+      }
+      if (bdy > -R && bdy < R) {
+        l = sadAt(prev, cur, aw, bx, by, B, bdx, bdy - 1, Infinity); r = sadAt(prev, cur, aw, bx, by, B, bdx, bdy + 1, Infinity);
+        den = l - 2 * best + r; if (den > 0) sy = Math.max(-0.5, Math.min(0.5, 0.5 * (l - r) / den));
+      }
+      return { dx: bdx + sx, dy: bdy + sy };
+    }
+    var P = null, prev = null;
+    function init(p) { P = p; prev = null; }
+    function frame(cur) {
+      var n = P.bx.length, dx = new Float32Array(n), dy = new Float32Array(n), ok = new Uint8Array(n), had = !!prev;
+      if (prev) {
+        for (var i = 0; i < n; i++) {
+          var r = matchBlock(prev, cur, P.aw, P.bx[i], P.by[i], P.B, P.R, P.tex);
+          if (r) { dx[i] = r.dx; dy[i] = r.dy; ok[i] = 1; }
+        }
+      }
+      prev = cur;
+      return { had: had, dx: dx, dy: dy, ok: ok };
+    }
+    return { init: init, frame: frame, matchBlock: matchBlock };
+  }
+
+  // 작업 스레드(Web Worker)에서 계산해 화면이 버벅이지 않게 한다. 실패하면 본 화면에서 계산한다.
+  function makeEngine(onFail) {
+    var worker = null, cb = {}, seq = 0, local = engineFactory(), lastInit = null;
+    try {
+      var src = "var E=(" + engineFactory.toString() + ")();" +
+        "self.onmessage=function(e){var m=e.data;try{if(m.type==='init'){E.init(m.p);return;}" +
+        "if(m.type==='frame'){var r=E.frame(m.buf);self.postMessage({id:m.id,had:r.had,dx:r.dx,dy:r.dy,ok:r.ok},[r.dx.buffer,r.dy.buffer,r.ok.buffer]);}}" +
+        "catch(err){self.postMessage({id:m.id,error:String(err&&err.message||err)});}};";
+      var url = URL.createObjectURL(new Blob([src], { type: "text/javascript" }));
+      worker = new Worker(url);
+      worker.onmessage = function (e) {
+        var m = e.data, f = cb[m.id]; delete cb[m.id];
+        if (!f) return;
+        if (m.error) { fallback(); f(null); return; }
+        f(m);
+      };
+      worker.onerror = function () { fallback(); };
+    } catch (e) { worker = null; }
+    function fallback() {
+      if (!worker) return;
+      try { worker.terminate(); } catch (e) {}
+      worker = null;
+      if (lastInit) local.init(lastInit);
+      var pend = cb; cb = {};
+      Object.keys(pend).forEach(function (k) { try { pend[k](null); } catch (e) {} });
+      if (onFail) onFail();
+    }
+    return {
+      usingWorker: function () { return !!worker; },
+      init: function (p) {
+        lastInit = p; local.init(p);
+        if (worker) { try { worker.postMessage({ type: "init", p: p }); } catch (e) { fallback(); } }
+      },
+      frame: function (buf, done) {
+        if (worker) {
+          var id = ++seq, fired = false;
+          cb[id] = function (r) { if (fired) return; fired = true; done(r); };
+          setTimeout(function () { if (cb[id]) { delete cb[id]; fallback(); if (!fired) { fired = true; done(null); } } }, 3000);
+          try { worker.postMessage({ type: "frame", id: id, buf: buf }, [buf.buffer]); }
+          catch (e) { delete cb[id]; fallback(); if (!fired) { fired = true; done(null); } }
+          return;
+        }
+        var r = null;
+        try { r = local.frame(buf); } catch (e) { r = null; }
+        done(r);
+      }
+    };
+  }
+
+  function percentile(arr, p) {
+    if (!arr.length) return 0;
+    var a = Array.prototype.slice.call(arr).sort(function (x, y) { return x - y; });
+    var idx = Math.min(a.length - 1, Math.max(0, Math.floor(p * (a.length - 1))));
+    return a[idx];
+  }
+  function meanSd(arr) {
+    if (!arr.length) return { m: 0, s: 0 };
+    var m = 0, i; for (i = 0; i < arr.length; i++) m += arr[i]; m /= arr.length;
+    var s = 0; for (i = 0; i < arr.length; i++) s += (arr[i] - m) * (arr[i] - m);
+    s = arr.length > 1 ? Math.sqrt(s / (arr.length - 1)) : 0;
+    return { m: m, s: s };
+  }
+  function linFit(xs, ys) {
+    var n = xs.length; if (n < 2) return null;
+    var sx = 0, sy = 0, sxx = 0, sxy = 0, i;
+    for (i = 0; i < n; i++) { sx += xs[i]; sy += ys[i]; sxx += xs[i] * xs[i]; sxy += xs[i] * ys[i]; }
+    var den = n * sxx - sx * sx; if (Math.abs(den) < 1e-12) return null;
+    var a = (n * sxy - sx * sy) / den; return { a: a, b: (sy - a * sx) / n };
+  }
+
+  // ---------- 2번 화면과 연결 (같은 브라우저 안에서) ----------
+  function makeBus(onMsg) {
+    var ch = null;
+    try { if (typeof BroadcastChannel !== "undefined") ch = new BroadcastChannel("solvay-slopewatch"); } catch (e) { ch = null; }
+    if (ch) {
+      ch.onmessage = function (e) { try { onMsg(e.data); } catch (x) {} };
+      return { send: function (m) { try { ch.postMessage(m); } catch (e) {} } };
+    }
+    var KEY = "solvay-slopewatch-bus";
+    window.addEventListener("storage", function (e) {
+      if (e.key !== KEY || !e.newValue) return;
+      try { onMsg(JSON.parse(e.newValue).m); } catch (x) {}
+    });
+    return { send: function (m) { try { localStorage.setItem(KEY, JSON.stringify({ m: m, n: Math.random() })); } catch (e) {} } };
+  }
+
+  // ---------- 기본 ----------
+  function $(id) { return document.getElementById(id); }
+  var LS_KEY = "solvay-slopewatch-runs-v1";
+  var TEX_MIN = 30;
+
+  var S = {
+    mode: "cam", tool: null, toolCam: null, drag: null,
+    phase: "idle", running: false, cfg: null, T0: 0,
+    precursor: null, preCam: null, collapseAuto: null, colCam: null, collapseManual: null, noPrecursor: false,
+    inv: [], pred: null, ema: null,
+    audio: null, wake: null, runs: [], runsSum: [], saved: false, doneMsg: "", err: false,
+    runId: 0, lastPing: 0, pend: [], pendInv: null, lastPush: 0
+  };
+
+  function makeCam(i) {
+    var c = {
+      i: i, name: i ? "위쪽" : "측면",
+      video: $("video" + i), overlay: $("overlay" + i), stage: $("stage" + i), empty: $("empty" + i),
+      stream: null, fileUrl: null, fileName: "", ready: false, active: false, ended: false,
+      aw: 0, ah: 0, roi: null, calPts: [], mmPerPx: null, blocks: [], grid: null,
+      busy: false, timer: null, lastT: null, samples: [], baseAll: [], baseSnaps: [], baseCount: 0, baseDone: false,
+      blockThr: null, fracThr: null, baseFrac: null, run: 0, runStart: 0, crun: 0, crunStart: 0,
+      precursor: null, collapseAuto: null, lastFrac: 0, lastFast: 0, maxCum: 0,
+      rec: null, recChunks: [], recMime: "", slowCount: 0, slowWarned: false, info: ""
+    };
+    c.octx = c.overlay.getContext("2d");
+    c.ac = document.createElement("canvas"); c.actx = c.ac.getContext("2d", { willReadFrequently: true });
+    c.hm = document.createElement("canvas"); c.hmctx = c.hm.getContext("2d");
+    c.engine = makeEngine(function () { $("perfHint").textContent = "작업 스레드를 쓸 수 없어 본 화면에서 계산합니다 (조금 느릴 수 있어요)."; });
+    return c;
+  }
+  var CAMS = [makeCam(0), makeCam(1)];
+
+  // ---------- 유틸 ----------
+  function num(id, def, lo, hi) {
+    var v = parseFloat($(id).value);
+    if (!isFinite(v)) v = def;
+    return Math.max(lo, Math.min(hi, v));
+  }
+  function unitV(c) { return (c || CAMS[0]).mmPerPx ? "mm/s" : "px/s"; }
+  function unitD(c) { return (c || CAMS[0]).mmPerPx ? "mm" : "px"; }
+  function fmtT(t) {
+    if (t == null || !isFinite(t)) return "–";
+    var m = Math.floor(t / 60), s = t - m * 60;
+    return (m > 0 ? m + "분 " : "") + s.toFixed(1) + "초";
+  }
+  function fmtN(v, d) { return (v == null || !isFinite(v)) ? "–" : v.toFixed(d); }
+  function pct(v) { return (v == null || !isFinite(v)) ? "–" : (v * 100).toFixed(v < 0.1 ? 1 : 0) + "%"; }
+  function readyCams() { return CAMS.filter(function (c) { return c.ready; }); }
+  function activeCams() { return CAMS.filter(function (c) { return c.active; }); }
+  function anyReady() { return CAMS[0].ready || CAMS[1].ready; }
+  function setNotice(text, kind) {
+    var el = $("notice");
+    S.err = !!text && kind === "err";
+    if (!text) { el.hidden = true; el.textContent = ""; }
+    else { el.hidden = false; el.textContent = text; el.className = "notice" + (kind ? " " + kind : ""); }
+    setMood();
+  }
+  function beep(freq, ms) {
+    try {
+      if (!S.audio) return;
+      var o = S.audio.createOscillator(), g = S.audio.createGain();
+      o.type = "triangle"; o.frequency.value = freq; g.gain.value = 0.12;
+      o.connect(g); g.connect(S.audio.destination);
+      o.start(); o.stop(S.audio.currentTime + ms / 1000);
+    } catch (e) { /* 소리는 선택 기능 */ }
+  }
+  function download(name, blob) {
+    try {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { try { URL.revokeObjectURL(url); a.remove(); } catch (e) {} }, 4000);
+      return true;
+    } catch (e) { return false; }
+  }
+  function csvCell(v) {
+    var s = v == null ? "" : String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function stamp() {
+    var d = new Date(), p = function (x) { return String(x).padStart(2, "0"); };
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes());
+  }
+  function collapseT() { return S.collapseManual != null ? S.collapseManual : S.collapseAuto; }
+  function leadT() { var c = collapseT(); return (c != null && S.precursor != null) ? Math.max(0, c - S.precursor) : null; }
+  function globalT() {
+    if (S.mode === "file") { var m = 0; activeCams().forEach(function (c) { m = Math.max(m, c.video.currentTime || 0); }); return m; }
+    return performance.now() / 1000 - S.T0;
+  }
+  function maxRatio() {
+    var r = 0; activeCams().forEach(function (c) { if (c.fracThr) r = Math.max(r, c.lastFrac / c.fracThr); }); return r;
+  }
+  function maxFast() { var f = 0; activeCams().forEach(function (c) { f = Math.max(f, c.lastFast); }); return f; }
+  function layoutStages() {
+    var two = CAMS[1].ready;
+    CAMS[1].stage.hidden = !two;
+    $("stages").setAttribute("data-n", two ? "2" : "1");
+    CAMS.forEach(function (c) { c.empty.hidden = c.ready; });
+    $("empty0").textContent = S.mode === "cam" ? "카메라를 켜면 여기에 화면이 나와요" : "측면 영상을 열면 여기에 나와요";
+    setTimeout(function () { CAMS.forEach(drawOverlay); }, 0);
+  }
+
+  // ---------- 흙돌이 ----------
+  var SAY = {
+    sleepy: "쿨쿨… 카메라를 켜 주세요", ready: "안녕! 준비됐어요", hold: "흡! 숨 참는 중… 움직이지 마세요",
+    calm: "흙이 조용해요. 물을 뿌려 볼까요?", curious: "어? 방금 뭔가 꿈틀했나?", worried: "흙이 움직여요! 대피하세요!",
+    panic: "으아아! 곧 무너져요!", collapse: "무너졌어요… 다들 무사하죠?", happy: "실험 끝! 수고했어요",
+    proud: "기록 완료! 최고예요", confused: "음… 뭔가 이상해요. 위 안내를 봐 주세요"
+  };
+  function mood() {
+    if (!anyReady()) return S.err ? "confused" : "sleepy";
+    if (S.running) {
+      if (S.phase === "baseline") return "hold";
+      if (collapseT() != null) return "collapse";
+      var cf = S.cfg ? S.cfg.colFrac : 0.08;
+      if (S.precursor != null) return (maxRatio() >= 3 || maxFast() >= cf * 0.5) ? "panic" : "worried";
+      return maxRatio() >= 0.5 ? "curious" : "calm";
+    }
+    if (S.phase === "done") return S.saved ? "proud" : "happy";
+    return S.err ? "confused" : "ready";
+  }
+  var curMood = "";
+  function setMood() {
+    var m = mood();
+    if (m === curMood) return;
+    curMood = m;
+    $("mascot").setAttribute("data-mood", m);
+    $("say").textContent = SAY[m] || "";
+  }
+
+  // ---------- 화면 상태 (지금 할 일) ----------
+  function curStep() {
+    if (!anyReady()) return 1;
+    if (S.running) return S.phase === "baseline" ? 3 : 4;
+    if (S.phase === "done") return 5;
+    return 2;
+  }
+  function baseLeft() { return S.cfg ? Math.max(0, S.cfg.base - globalT()) : 0; }
+  var G = { K: "", T: "", D: "", tone: "" };
+  function refreshUI() {
+    var step = curStep();
+    var lis = $("steps").querySelectorAll("li");
+    for (var i = 0; i < lis.length; i++) {
+      var s = +lis[i].getAttribute("data-s");
+      lis[i].className = s < step ? "done" : s === step ? "now" : "";
+    }
+    var K = "지금 할 일", T = "", D = "", tone = "";
+    var prim = $("primaryBtn");
+    prim.className = "big primary"; prim.disabled = false;
+    var nCam = readyCams().length;
+
+    if (step === 1) {
+      if (S.mode === "cam") {
+        T = "카메라를 켜 주세요";
+        D = "카메라 1(측면)을 고르고, 위쪽 카메라가 있으면 카메라 2도 고른 뒤 ‘카메라 켜기’를 누르세요. 권한을 묻는 창이 뜨면 ‘허용’을 누릅니다.";
+        prim.textContent = "카메라 켜기";
+      } else {
+        T = "녹화한 측면 영상을 열어 주세요";
+        D = "‘영상 파일 고르기’로 측면 영상을 고르세요. 위쪽 영상은 다음 단계에서 추가할 수 있어요.";
+        prim.textContent = "영상 파일 고르기";
+      }
+    } else if (step === 2) {
+      if (S.tool === "roi") { T = "흙 사면을 사각형으로 감싸 주세요"; D = "영역을 정할 카메라 화면에서 마우스로 끌어서 흙 사면만 들어가게 사각형을 그리세요. 물줄기와 노즐은 빼세요."; }
+      else if (S.tool === "cal") { T = "자의 두 눈금을 차례로 콕콕 눌러 주세요"; D = "길이를 맞출 카메라 화면에서 자의 멀리 떨어진 두 눈금을 찍고, 두 점 사이 실제 길이(mm)를 칸에 입력하세요."; }
+      else {
+        T = "준비됐어요! ‘감시 시작’을 눌러 주세요";
+        D = "카메라 " + nCam + "대로 감시해요. "
+          + (CAMS.some(function (c) { return c.ready && !c.roi; }) ? "영역을 그리지 않은 카메라는 화면 가운데 80%를 감시해요. 물줄기가 보이면 꼭 영역을 그려서 빼 주세요. " : "")
+          + " 시작하면 먼저 " + Math.round(num("setBase", 20, 5, 300)) + "초 동안 흔들림을 배우니 물은 그다음에 뿌리세요.";
+      }
+      prim.textContent = "감시 시작";
+    } else if (step === 3) {
+      K = "흔들림 학습 중";
+      T = "숨 참는 중… " + Math.ceil(baseLeft()) + "초만 기다려 주세요";
+      D = "카메라 잡음이 만드는 가짜 움직임의 크기를 재고 있어요. 물을 뿌리거나 카메라·책상을 건드리지 마세요.";
+      prim.textContent = "정지"; prim.className = "big stop";
+    } else if (step === 4) {
+      prim.textContent = "정지"; prim.className = "big stop";
+      if (collapseT() != null) {
+        K = "붕괴 기록됨"; tone = "danger";
+        T = "무너졌어요! ‘정지’를 눌러 주세요";
+        D = "정지하면 결과가 정리되고, 이번 실험 숫자를 기록할 수 있어요.";
+      } else if (S.precursor != null) {
+        K = "전조 경보" + (S.preCam != null ? " (" + CAMS[S.preCam].name + " 카메라)" : ""); tone = "warn";
+        T = "흙이 움직이기 시작했어요! 대피!";
+        D = "흙덩이가 실제로 미끄러지는 순간 빨간 ‘흙이 무너졌어요!’ 버튼을 누르세요. 빠른 움직임이 넓게 잡히면 프로그램도 자동으로 붕괴를 기록해요.";
+      } else {
+        T = "이제 물을 뿌려 주세요";
+        D = "어느 카메라든 움직이는 칸이 경보선을 넘으면 자동으로 ‘전조’ 경보가 울려요. 흙이 무너지는 걸 보면 빨간 버튼을 누르세요.";
+      }
+    } else {
+      K = "결과 확인";
+      T = S.saved ? "기록 완료! 다음 실험을 준비해요" : "수고했어요! 결과를 기록해 주세요";
+      D = S.doneMsg || "";
+      prim.textContent = "새로 감시 시작";
+      prim.className = S.saved ? "big primary" : "big";
+    }
+    $("guideK").textContent = K; $("guideT").textContent = T; $("guideD").textContent = D;
+    G.K = K; G.T = T; G.D = D; G.tone = tone;
+    var cmd = $("cmd"); if (tone) cmd.setAttribute("data-tone", tone); else cmd.removeAttribute("data-tone");
+    setMood();
+
+    $("camSel").hidden = !(S.mode === "cam" && step === 1);
+    $("collapseBtn").hidden = !(step === 4 && collapseT() == null);
+    var sv = $("saveBtn");
+    sv.hidden = step !== 5 || !CAMS.some(function (c) { return c.samples.length > 1; });
+    sv.disabled = S.saved; sv.textContent = S.saved ? "기록됨" : "이 결과 기록하기";
+    sv.className = S.saved ? "big" : "big primary";
+    $("tools").hidden = !(step === 2 || step === 5);
+    $("camOff").hidden = S.mode !== "cam";
+    $("fileAgain").hidden = S.mode !== "file";
+    $("fileAdd1").hidden = S.mode !== "file";
+    $("fileAdd1").textContent = CAMS[1].ready ? "위쪽 영상 바꾸기" : "위쪽 영상 추가 (선택)";
+    $("toolRoi").classList.toggle("on", S.tool === "roi");
+    $("toolCal").classList.toggle("on", S.tool === "cal");
+    $("modeCam").disabled = S.running; $("modeFile").disabled = S.running;
+    $("rateBox").hidden = S.mode !== "file";
+    $("csvSeries").disabled = S.running || !CAMS.some(function (c) { return c.samples.length > 1; });
+    ["setBase", "setK", "setConsec", "setFast", "setColFrac", "setInterval", "setRes", "setBlock", "setRadius", "calMm", "condSel", "trialName", "rate", "recOn"]
+      .forEach(function (id) { $(id).disabled = S.running; });
+    $("srcInfo").textContent = readyCams().length ? readyCams().map(function (c) { return c.name + ": " + c.info; }).join(" / ") : "영상이 아직 없어요.";
+    updateCalOut();
+    updateBanner();
+    pushState(true);
+    cloudLive(true);
+  }
+  function updateBanner() {
+    var b = $("banner");
+    if (S.running && S.phase === "baseline") {
+      b.className = "banner base"; b.hidden = false;
+      $("bannerT").textContent = "흔들림 배우는 중 · 물 뿌리지 마세요"; $("bannerV").textContent = Math.ceil(baseLeft()) + "초";
+    } else if (collapseT() != null && (S.running || S.phase === "done")) {
+      b.className = "banner col"; b.hidden = false;
+      $("bannerT").textContent = S.collapseManual != null ? "무너졌어요 (눈으로 확인)" : "무너졌어요 (" + (S.colCam != null ? CAMS[S.colCam].name + " 카메라 " : "") + "자동 감지)"; $("bannerV").textContent = fmtT(collapseT());
+    } else if (S.precursor != null && (S.running || S.phase === "done")) {
+      b.className = "banner pre"; b.hidden = false;
+      $("bannerT").textContent = "붕괴 전조 감지! 대피하세요"; $("bannerV").textContent = fmtT(S.precursor);
+    } else b.hidden = true;
+  }
+
+  // ---------- 2번 화면으로 보내기 ----------
+  var bus = makeBus(function (m) {
+    if (!m || typeof m !== "object") return;
+    if (m.type === "hello" || m.type === "ping") {
+      var wasAlive = displayAlive();
+      S.lastPing = Date.now(); updateDispPill();
+      if (m.type === "hello" || !wasAlive) sendSnap();
+    }
+  });
+  function displayAlive() { return Date.now() - S.lastPing < 8000; }
+  function updateDispPill() {
+    var p = $("dispPill"), on = displayAlive();
+    p.textContent = on ? "2번 화면 연결됨" : "2번 화면 연결 안 됨";
+    p.classList.toggle("on", on);
+  }
+  function stateObj() {
+    var last = null, lt = -1;
+    CAMS.forEach(function (c) { var s = c.samples[c.samples.length - 1]; if (s && s.t > lt) { lt = s.t; last = s; } });
+    var speed = null;
+    activeCams().forEach(function (c) { var s = c.samples[c.samples.length - 1]; if (s) speed = Math.max(speed || 0, s.vs); });
+    return {
+      runId: S.runId, step: curStep(), mood: mood(), say: SAY[mood()] || "", K: G.K, T: G.T, D: G.D, tone: G.tone,
+      running: S.running, phase: S.phase, pre: S.precursor, col: collapseT(), colManual: S.collapseManual != null,
+      lead: leadT(), noPre: S.noPrecursor, pred: S.pred, base: S.cfg ? S.cfg.base : null, colFrac: S.cfg ? S.cfg.colFrac : null,
+      elapsed: S.running || S.phase === "done" ? (S.running ? globalT() : (last ? last.t : null)) : null,
+      ratio: maxRatio(), speed: speed,
+      cams: CAMS.map(function (c) { return { name: c.name, on: c.ready, frac: c.lastFrac, fracThr: c.fracThr, unitV: unitV(c), unitD: unitD(c) }; }),
+      unitV: unitV(), unitD: unitD(), cond: $("condSel").value, name: $("trialName").value, runsSum: S.runsSum
+    };
+  }
+  function pushState(force) {
+    if (!displayAlive()) { S.pend = []; S.pendInv = null; return; }
+    var now = Date.now();
+    if (!force && !S.pend.length && !S.pendInv && now - S.lastPush < 1000) return;
+    S.lastPush = now;
+    var st = stateObj();
+    st.ss = S.pend; st.ip = S.pendInv;
+    S.pend = []; S.pendInv = null;
+    bus.send({ type: "st", st: st });
+  }
+  function sendSnap() {
+    bus.send({
+      type: "snap", st: stateObj(),
+      samples: CAMS.map(function (c) { return c.samples.map(function (s) { return { t: s.t, frac: s.frac, vs: s.vs, cum: s.cum }; }); }),
+      inv: S.inv.slice()
+    });
+  }
+  setInterval(function () { updateDispPill(); if (!S.running) pushState(true); }, 1500);
+
+  // ---------- 입력 영상 ----------
+  function setMode(m) {
+    if (S.running) return;
+    S.mode = m;
+    $("modeCam").setAttribute("aria-pressed", m === "cam" ? "true" : "false");
+    $("modeFile").setAttribute("aria-pressed", m === "file" ? "true" : "false");
+    CAMS.forEach(function (c) { stopCam(c); clearFile(c); });
+    S.phase = "idle"; S.tool = null; CAMS.forEach(function (c) { c.overlay.classList.remove("drawing"); });
+    setNotice("");
+    layoutStages(); refreshUI();
+  }
+  async function listCams() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+      var devs = await navigator.mediaDevices.enumerateDevices();
+      var cams = devs.filter(function (d) { return d.kind === "videoinput"; });
+      [0, 1].forEach(function (k) {
+        var sel = $("camSelect" + k), keep = sel.value;
+        sel.innerHTML = "";
+        var o0 = document.createElement("option"); o0.value = ""; o0.textContent = k ? "사용 안 함" : "기본 카메라"; sel.appendChild(o0);
+        cams.forEach(function (d, i) {
+          var o = document.createElement("option"); o.value = d.deviceId || ("idx" + i); o.textContent = d.label || ("카메라 " + (i + 1)); sel.appendChild(o);
+        });
+        if (keep && Array.prototype.some.call(sel.options, function (o) { return o.value === keep; })) sel.value = keep;
+      });
+    } catch (e) { /* 목록은 선택 기능 */ }
+  }
+  async function openCam(c, deviceId) {
+    var cons = { audio: false, video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } } };
+    if (deviceId && deviceId.indexOf("idx") !== 0) cons.video.deviceId = { exact: deviceId };
+    else cons.video.facingMode = { ideal: "environment" }; // 폰에서는 후면 카메라 우선 (노트북에서는 무시됨)
+    var stream = await navigator.mediaDevices.getUserMedia(cons);
+    c.stream = stream;
+    c.video.srcObject = stream; c.video.muted = true;
+    await c.video.play();
+    await waitDims(c.video);
+    if (!onSourceReady(c)) throw { name: "NoSize" };
+    var tr = stream.getVideoTracks()[0], st = tr && tr.getSettings ? tr.getSettings() : {};
+    c.info = (tr ? tr.label : "카메라") + " · " + c.video.videoWidth + "×" + c.video.videoHeight + (st.frameRate ? " · " + Math.round(st.frameRate) + "fps" : "");
+  }
+  function camErr(e) {
+    var name = e && e.name ? e.name : "";
+    return name === "NotAllowedError" ? "카메라 권한이 거부됐어요. 주소창의 카메라 아이콘(또는 사파리 설정)에서 허용하고 다시 누르세요."
+      : name === "NotFoundError" || name === "OverconstrainedError" ? "선택한 카메라를 찾지 못했어요. 목록에서 다른 카메라를 고르세요."
+      : name === "NotReadableError" ? "다른 프로그램이 카메라를 쓰고 있어요. 줌·카메라 앱 등을 닫고 다시 누르세요."
+      : "카메라를 열지 못했어요 (" + (name || "알 수 없는 오류") + ").";
+  }
+  async function startCameras() {
+    if (S.running) return;
+    if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setNotice("이 주소에서는 카메라를 쓸 수 없어요. https 주소(GitHub Pages)로 여세요. ‘녹화 영상 분석’은 어디서나 됩니다.", "err");
+      return;
+    }
+    var id0 = $("camSelect0").value, id1 = $("camSelect1").value;
+    if (id1 && id1 === id0) { setNotice("카메라 1과 카메라 2에 같은 카메라를 골랐어요. 카메라 2는 다른 카메라를 고르거나 ‘사용 안 함’으로 두세요.", "err"); return; }
+    CAMS.forEach(stopCam);
+    var prim = $("primaryBtn");
+    prim.disabled = true; prim.textContent = "카메라 여는 중…";
+    setNotice("");
+    try { await openCam(CAMS[0], id0); }
+    catch (e) { stopCam(CAMS[0]); setNotice(camErr(e), "err"); layoutStages(); refreshUI(); return; }
+    if (id1) {
+      try { await openCam(CAMS[1], id1); }
+      catch (e) { stopCam(CAMS[1]); setNotice("위쪽 카메라를 열지 못해서 측면 카메라만 써요. " + camErr(e), "err"); }
+    }
+    if (S.phase === "idle") S.phase = "ready";
+    listCams(); layoutStages(); refreshUI();
+  }
+  function stopCam(c) {
+    try { if (c.stream) c.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+    c.stream = null;
+    if (S.mode === "cam" || !c.fileUrl) { try { c.video.pause(); c.video.srcObject = null; } catch (e) {} c.ready = false; }
+  }
+  function clearFile(c) {
+    try { if (c.fileUrl) URL.revokeObjectURL(c.fileUrl); } catch (e) {}
+    c.fileUrl = null;
+    try { c.video.pause(); c.video.removeAttribute("src"); c.video.load(); } catch (e) {}
+    c.ready = false;
+  }
+  function waitDims(v) {
+    return new Promise(function (res) {
+      var n = 0;
+      (function chk() {
+        if (v.videoWidth > 0 && v.videoHeight > 0) return res();
+        if (++n > 100) return res();
+        setTimeout(chk, 50);
+      })();
+    });
+  }
+  function onFile(c, f) {
+    if (S.running || !f) return;
+    clearFile(c);
+    try { c.video.srcObject = null; } catch (e) {}
+    c.fileUrl = URL.createObjectURL(f); c.fileName = f.name;
+    c.video.muted = true; c.video.src = c.fileUrl;
+    setNotice(c.name + " 영상을 여는 중…");
+    var done = false;
+    var bad = "이 영상 형식은 이 브라우저에서 열리지 않아요. 아이폰 설정 → 카메라 → 포맷을 ‘높은 호환성’으로 바꿔 다시 찍거나, 크롬·사파리 최신 버전을 쓰세요.";
+    c.video.onloadedmetadata = function () {
+      if (done) return; done = true;
+      if (!c.video.videoWidth) { setNotice(bad, "err"); layoutStages(); refreshUI(); return; }
+      try { c.video.currentTime = 0; } catch (e) {}
+      setNotice("");
+      onSourceReady(c);
+      c.info = f.name + " · " + c.video.videoWidth + "×" + c.video.videoHeight + " · " + fmtT(c.video.duration);
+      if (S.phase === "idle") S.phase = "ready";
+      layoutStages(); refreshUI();
+    };
+    c.video.onerror = function () {
+      if (done) return; done = true;
+      setNotice(bad, "err"); layoutStages(); refreshUI();
+    };
+  }
+  function onSourceReady(c) {
+    var vw = c.video.videoWidth, vh = c.video.videoHeight;
+    if (!vw || !vh) { setNotice("영상 크기를 읽지 못했어요. 다시 시도하세요.", "err"); return false; }
+    c.stage.style.setProperty("--ar", (vw / vh).toFixed(5));
+    var res = Math.round(num("setRes", 640, 320, 1280));
+    var aw = Math.min(res, vw), ah = Math.round(aw * vh / vw);
+    if (aw !== c.aw || ah !== c.ah) { c.roi = null; c.calPts = []; c.mmPerPx = null; }
+    c.aw = aw; c.ah = ah; c.ac.width = aw; c.ac.height = ah;
+    c.overlay.width = aw * 2; c.overlay.height = ah * 2;
+    c.ready = true;
+    updateLimitHint();
+    drawOverlay(c);
+    return true;
+  }
+
+  // ---------- 영역, 보정 ----------
+  function evToA(c, ev) {
+    var r = c.overlay.getBoundingClientRect();
+    return { x: (ev.clientX - r.left) / r.width * c.aw, y: (ev.clientY - r.top) / r.height * c.ah };
+  }
+  function setTool(t) {
+    if (S.running || !anyReady()) return;
+    S.tool = S.tool === t ? null : t; S.toolCam = null;
+    CAMS.forEach(function (c) { c.overlay.classList.toggle("drawing", !!S.tool); });
+    CAMS.forEach(drawOverlay); refreshUI();
+  }
+  function endTool() { S.tool = null; S.toolCam = null; CAMS.forEach(function (c) { c.overlay.classList.remove("drawing"); }); }
+  CAMS.forEach(function (c) {
+    c.overlay.addEventListener("pointerdown", function (ev) {
+      if (!c.ready || !S.tool || S.running) return;
+      var p = evToA(c, ev);
+      if (S.tool === "roi") { S.toolCam = c.i; S.drag = { x0: p.x, y0: p.y, x1: p.x, y1: p.y }; try { c.overlay.setPointerCapture(ev.pointerId); } catch (e) {} }
+      else if (S.tool === "cal") {
+        if (S.toolCam !== c.i) { S.toolCam = c.i; c.calPts = []; c.mmPerPx = null; }
+        c.calPts.push(p);
+        if (c.calPts.length >= 2) { c.calPts = c.calPts.slice(0, 2); computeCal(c); endTool(); refreshUI(); }
+        drawOverlay(c);
+      }
+    });
+    c.overlay.addEventListener("pointermove", function (ev) {
+      if (!S.drag || S.toolCam !== c.i) return; var p = evToA(c, ev); S.drag.x1 = p.x; S.drag.y1 = p.y; drawOverlay(c);
+    });
+    c.overlay.addEventListener("pointerup", function () {
+      if (!S.drag || S.toolCam !== c.i) return;
+      var d = S.drag; S.drag = null;
+      var x = Math.max(0, Math.min(d.x0, d.x1)), y = Math.max(0, Math.min(d.y0, d.y1));
+      var w = Math.min(c.aw, Math.max(d.x0, d.x1)) - x, h = Math.min(c.ah, Math.max(d.y0, d.y1)) - y;
+      if (w >= 40 && h >= 40) { c.roi = { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) }; endTool(); setNotice(""); }
+      else setNotice("영역이 너무 작아요. 더 크게 끌어서 그리세요.", "err");
+      drawOverlay(c); refreshUI();
+    });
+  });
+  function computeCal(c) {
+    var a = c.calPts[0], b = c.calPts[1];
+    if (!a || !b) { c.mmPerPx = null; return; }
+    var px = Math.hypot(b.x - a.x, b.y - a.y), mm = num("calMm", 100, 0.1, 100000);
+    c.mmPerPx = px >= 5 ? mm / px : null;
+    if (px < 5) setNotice("두 점이 너무 가까워요. 자에서 더 멀리 떨어진 두 눈금을 찍으세요.", "err"); else setNotice("");
+    updateLimitHint();
+  }
+  function updateCalOut() {
+    var parts = readyCams().map(function (c) { return c.name + " " + (c.mmPerPx ? "mm (1픽셀 = " + c.mmPerPx.toFixed(3) + " mm)" : "픽셀"); });
+    $("calOut").textContent = "길이 단위: " + (parts.length ? parts.join(" / ") : "픽셀") + " · 자로 길이를 맞추면 mm로 바뀝니다";
+  }
+  function updateLimitHint() {
+    var R = Math.round(num("setRadius", 4, 2, 10)), dt = num("setInterval", 250, 100, 2000) / 1000, B = Math.round(num("setBlock", 12, 8, 40));
+    var c = CAMS[0], sc = c.mmPerPx || 1;
+    $("limitHint").textContent = "측면 카메라 기준 · 칸 하나 크기 약 " + (B * sc).toFixed(1) + " " + unitD(c) + " · 한 번에 잴 수 있는 최대 이동 " + (R * sc).toFixed(1) + " " + unitD(c)
+      + " (약 " + (R / dt * sc).toFixed(1) + " " + unitV(c) + ") · 이론상 감지 가능한 최소 이동 약 " + (0.1 * sc).toFixed(3) + " " + unitD(c) + ".";
+  }
+  function activeRoi(c) {
+    if (c.roi) return c.roi;
+    return { x: Math.round(c.aw * 0.1), y: Math.round(c.ah * 0.1), w: Math.round(c.aw * 0.8), h: Math.round(c.ah * 0.8) };
+  }
+
+  // ---------- 오버레이 (부드러운 열지도) ----------
+  function heatColor(r, fastMul) {
+    if (!(r >= 0.7)) return null;
+    if (r >= fastMul) return [205, 35, 35, 215];
+    if (r >= 1) { var u = Math.min(1, (r - 1) / (fastMul - 1)); return [242, Math.round(130 - 70 * u), 60, Math.round(150 + 50 * u)]; }
+    var w = (r - 0.7) / 0.3; return [246, 195, 67, Math.round(50 + 70 * w)];
+  }
+  function drawOverlay(c) {
+    var octx = c.octx, W = c.overlay.width, H = c.overlay.height;
+    octx.setTransform(1, 0, 0, 1, 0, 0);
+    octx.clearRect(0, 0, W, H);
+    if (!c.ready || !c.aw) return;
+    var sc = W / c.aw;
+    octx.setTransform(sc, 0, 0, sc, 0, 0);
+    var roi = activeRoi(c), lw = 3 / sc;
+    if (c.grid && c.blocks.length && S.cfg && c.blockThr != null) {
+      var g = c.grid, B = S.cfg.B;
+      if (c.hm.width !== g.cols || c.hm.height !== g.rows) { c.hm.width = g.cols; c.hm.height = g.rows; }
+      var img = c.hmctx.createImageData(g.cols, g.rows), px = img.data;
+      for (var i = 0; i < c.blocks.length; i++) {
+        var bk = c.blocks[i];
+        if (!(bk.s > 0)) continue;
+        var col = heatColor(bk.s / c.blockThr, S.cfg.fastMul);
+        if (!col) continue;
+        var o = (bk.gy * g.cols + bk.gx) * 4;
+        px[o] = col[0]; px[o + 1] = col[1]; px[o + 2] = col[2]; px[o + 3] = col[3];
+      }
+      c.hmctx.putImageData(img, 0, 0);
+      octx.imageSmoothingEnabled = true;
+      try { octx.imageSmoothingQuality = "high"; } catch (e) {}
+      octx.drawImage(c.hm, g.x0, g.y0, g.cols * B, g.rows * B);
+      if ($("showArrows").checked) {
+        octx.strokeStyle = "#7fcf87"; octx.lineWidth = lw / 2;
+        for (var j = 0; j < c.blocks.length; j++) {
+          var b2 = c.blocks[j], m = Math.hypot(b2.cumX, b2.cumY);
+          if (m < 0.5) continue;
+          var cx = b2.x + B / 2, cy = b2.y + B / 2, k = Math.min(5, (B * 1.5) / m);
+          octx.beginPath(); octx.moveTo(cx, cy); octx.lineTo(cx + b2.cumX * k, cy + b2.cumY * k); octx.stroke();
+        }
+      }
+    }
+    octx.strokeStyle = "#7fcf87"; octx.lineWidth = lw;
+    octx.setLineDash(c.roi ? [] : [8, 6]);
+    octx.strokeRect(roi.x, roi.y, roi.w, roi.h);
+    octx.setLineDash([]);
+    if (S.drag && S.toolCam === c.i) {
+      var d = S.drag;
+      octx.strokeStyle = "#ffffff"; octx.setLineDash([5, 4]);
+      octx.strokeRect(Math.min(d.x0, d.x1), Math.min(d.y0, d.y1), Math.abs(d.x1 - d.x0), Math.abs(d.y1 - d.y0));
+      octx.setLineDash([]);
+    }
+    if (c.calPts.length) {
+      octx.strokeStyle = "#f6c343"; octx.fillStyle = "#f6c343"; octx.lineWidth = lw;
+      if (c.calPts.length === 2) { octx.beginPath(); octx.moveTo(c.calPts[0].x, c.calPts[0].y); octx.lineTo(c.calPts[1].x, c.calPts[1].y); octx.stroke(); }
+      c.calPts.forEach(function (p) { octx.beginPath(); octx.arc(p.x, p.y, 6 / sc, 0, Math.PI * 2); octx.fill(); });
+    }
+  }
+
+  // ---------- 감시 ----------
+  function readCfg() {
+    return {
+      base: num("setBase", 20, 5, 300), k: num("setK", 3, 1, 10), consec: Math.round(num("setConsec", 3, 1, 20)),
+      fastMul: num("setFast", 5, 2, 30), colFrac: num("setColFrac", 8, 1, 80) / 100,
+      interval: Math.round(num("setInterval", 250, 100, 2000)),
+      B: Math.round(num("setBlock", 12, 8, 40)), R: Math.round(num("setRadius", 4, 2, 10))
+    };
+  }
+  function buildBlocks(c) {
+    var roi = activeRoi(c), B = S.cfg.B, R = S.cfg.R, list = [];
+    var x0 = Math.max(roi.x, R), y0 = Math.max(roi.y, R);
+    var x1 = Math.min(roi.x + roi.w, c.aw - R), y1 = Math.min(roi.y + roi.h, c.ah - R);
+    var cols = Math.max(0, Math.floor((x1 - x0) / B)), rows = Math.max(0, Math.floor((y1 - y0) / B));
+    for (var gy = 0; gy < rows; gy++) for (var gx = 0; gx < cols; gx++) {
+      list.push({ x: x0 + gx * B, y: y0 + gy * B, gx: gx, gy: gy, cumX: 0, cumY: 0, s: 0 });
+    }
+    c.grid = { x0: x0, y0: y0, cols: cols, rows: rows };
+    return list;
+  }
+  function grabGray(c, out) {
+    c.actx.drawImage(c.video, 0, 0, c.aw, c.ah);
+    var d = c.actx.getImageData(0, 0, c.aw, c.ah).data, n = c.aw * c.ah, sum = 0, i, g;
+    for (i = 0; i < n; i++) { g = (d[i * 4] * 77 + d[i * 4 + 1] * 150 + d[i * 4 + 2] * 29) >> 8; out[i] = g; sum += g; }
+    var m = Math.round(sum / n);
+    for (i = 0; i < n; i++) out[i] -= m; // 전체 밝기 변화 보정
+  }
+  function resetCamRun(c) {
+    c.busy = false; c.lastT = null; c.samples = []; c.baseAll = []; c.baseSnaps = []; c.baseCount = 0; c.baseDone = false;
+    c.blockThr = null; c.fracThr = null; c.baseFrac = null; c.run = 0; c.crun = 0; c.precursor = null; c.collapseAuto = null;
+    c.lastFrac = 0; c.lastFast = 0; c.maxCum = 0; c.slowCount = 0; c.slowWarned = false; c.ended = false;
+  }
+  async function startWatch() {
+    if (S.running || !anyReady()) return;
+    endTool();
+    try { if (!S.audio) { var AC = window.AudioContext || window.webkitAudioContext; if (AC) S.audio = new AC(); } if (S.audio && S.audio.resume) await S.audio.resume(); } catch (e) {}
+    S.cfg = readCfg();
+    var use = [];
+    for (var k = 0; k < CAMS.length; k++) {
+      var c = CAMS[k];
+      resetCamRun(c); c.active = false;
+      if (!c.ready) continue;
+      if (S.mode === "file") onSourceReady(c);
+      c.blocks = buildBlocks(c);
+      if (c.blocks.length < 4) { setNotice(c.name + " 카메라의 감시 영역이 너무 작아요. 영역을 더 크게 그리거나 감지 설정에서 칸 크기를 줄이세요.", "err"); refreshUI(); return; }
+      var bx = new Int32Array(c.blocks.length), by = new Int32Array(c.blocks.length);
+      c.blocks.forEach(function (b, i) { bx[i] = b.x; by[i] = b.y; });
+      c.engine.init({ aw: c.aw, B: S.cfg.B, R: S.cfg.R, tex: TEX_MIN, bx: bx, by: by });
+      use.push(c);
+    }
+    if (!use.length) return;
+    S.precursor = null; S.preCam = null; S.collapseAuto = null; S.colCam = null; S.collapseManual = null; S.noPrecursor = false;
+    S.inv = []; S.pred = null; S.ema = null; S.saved = false; S.doneMsg = ""; S.pend = []; S.pendInv = null; S.runId++;
+    setNotice("");
+    S.running = true; S.phase = "baseline"; S.T0 = performance.now() / 1000;
+    use.forEach(function (c) { c.active = true; });
+    updateReadouts();
+    refreshUI();
+    if (displayAlive()) sendSnap();
+    try { if (navigator.wakeLock && navigator.wakeLock.request) S.wake = await navigator.wakeLock.request("screen"); } catch (e) { S.wake = null; }
+    if (S.mode === "cam") use.forEach(startRecorder);
+    if (S.mode === "file") {
+      var rate = parseFloat($("rate").value) || 1;
+      try {
+        use.forEach(function (c) {
+          c.video.pause(); c.video.currentTime = 0; c.video.playbackRate = rate;
+          c.video.onended = function () { c.ended = true; if (S.running && activeCams().every(function (x) { return x.ended; })) stopWatch("영상이 끝났어요."); };
+        });
+        await Promise.all(use.map(function (c) { return c.video.play(); }));
+      } catch (e) {
+        setNotice("영상을 재생하지 못했어요. 다른 영상으로 다시 시도하세요.", "err");
+        stopWatch(null); return;
+      }
+    }
+    use.forEach(function (c) { schedule(c, 50); });
+  }
+  function camTime(c) { return S.mode === "file" ? c.video.currentTime : performance.now() / 1000 - S.T0; }
+  function schedule(c, ms) { if (S.running && c.active) { clearTimeout(c.timer); c.timer = setTimeout(function () { tick(c); }, ms); } }
+  function tick(c) {
+    if (!S.running || !c.active) return;
+    if (c.busy) { schedule(c, 30); return; }
+    if (c.video.readyState < 2) { schedule(c, 100); return; }
+    var tNow = camTime(c);
+    if (c.lastT != null && !(tNow - c.lastT > 0.02)) { schedule(c, 50); return; }
+    var t1 = performance.now(), buf;
+    try { buf = new Int16Array(c.aw * c.ah); grabGray(c, buf); }
+    catch (e) { setNotice(c.name + " 카메라 화면을 읽지 못했어요: " + (e && e.message ? e.message : e), "err"); schedule(c, 500); return; }
+    c.busy = true;
+    var myRun = S.runId;
+    c.engine.frame(buf, function (res) {
+      c.busy = false;
+      if (!S.running || myRun !== S.runId || !c.active) return;
+      if (res) {
+        try { handleResult(c, res, tNow); }
+        catch (e) { setNotice("분석 중 오류가 나서 이번 장면은 건너뛰었어요: " + (e && e.message ? e.message : e), "err"); }
+      }
+      var proc = performance.now() - t1;
+      if (proc > S.cfg.interval * 0.9) {
+        c.slowCount++;
+        if (c.slowCount >= 5 && !c.slowWarned) {
+          c.slowWarned = true;
+          setNotice("이 컴퓨터에서는 분석이 조금 느려요(" + c.name + " 1회 약 " + Math.round(proc) + " ms). 감지 설정에서 칸 크기를 키우거나 분석 해상도를 낮추면 빨라져요.");
+        }
+      } else c.slowCount = 0;
+      c.proc = proc;
+      $("perfHint").textContent = activeCams().map(function (x) { return x.name + " 1회 " + Math.round(x.proc || 0) + " ms · 칸 " + x.blocks.length + "개"; }).join(" / ")
+        + " · " + (c.engine.usingWorker() ? "작업 스레드 사용" : "본 화면에서 계산");
+      schedule(c, Math.max(10, S.cfg.interval - proc));
+    });
+  }
+  function handleResult(c, res, tNow) {
+    if (!res.had) { c.lastT = tNow; return; }
+    var dt = tNow - c.lastT;
+    if (!(dt > 0)) return;
+    c.lastT = tNow;
+    var cfg = S.cfg, sc = c.mmPerPx || 1, n = c.blocks.length, i, bk;
+    var thr = c.blockThr, speeds = [], cums = [], moving = 0, fastN = 0, valid = 0, moveSum = 0;
+    for (i = 0; i < n; i++) {
+      bk = c.blocks[i];
+      if (!res.ok[i]) { bk.s *= 0.5; continue; }
+      valid++;
+      var inst = Math.hypot(res.dx[i], res.dy[i]) * sc / dt;
+      bk.s = bk.s > 0 ? 0.5 * inst + 0.5 * bk.s : inst; // 칸마다 잡음을 줄이는 부드럽게 하기
+      speeds.push(bk.s);
+      if (thr != null) {
+        if (bk.s > thr) { moving++; moveSum += bk.s; bk.cumX += res.dx[i]; bk.cumY += res.dy[i]; }
+        if (bk.s > thr * cfg.fastMul) fastN++;
+      }
+      var cm = Math.hypot(bk.cumX, bk.cumY) * sc; if (cm > 0) cums.push(cm);
+    }
+    if (valid < 10) { setNotice(c.name + " 카메라에서 무늬가 보이는 칸이 너무 적어요. 조명을 밝히거나 흙 표면에 색 모래를 뿌리세요.", "err"); drawOverlay(c); return; }
+    if (S.err && /무늬가 보이는/.test($("notice").textContent) && $("notice").textContent.indexOf(c.name) === 0) setNotice("");
+    var t = tNow;
+    var vs = percentile(speeds, 0.9);
+    var cum = cums.length ? percentile(cums, 0.97) : 0;
+    c.maxCum = Math.max(c.maxCum, cum);
+    var frac = thr != null ? moving / valid : null, fast = thr != null ? fastN / valid : null;
+    c.lastFrac = frac || 0; c.lastFast = fast || 0;
+    c.samples.push({ t: t, frac: frac, fast: fast, vs: vs, cum: cum, n: valid, mv: moving ? moveSum / moving : 0 });
+    if (c.samples.length > 20000) c.samples.shift();
+    S.pend.push({ cam: c.i, t: t, frac: frac, vs: vs, cum: cum });
+    if (S.pend.length > 40) S.pend.shift();
+    var changed = false;
+
+    if (!c.baseDone) {
+      for (i = 0; i < speeds.length; i++) {
+        if (c.baseAll.length < 120000) c.baseAll.push(speeds[i]);
+        else { var j = Math.floor(Math.random() * (c.baseAll.length + i + 1)); if (j < c.baseAll.length) c.baseAll[j] = speeds[i]; }
+      }
+      if (c.baseSnaps.length < 600) c.baseSnaps.push(Float32Array.from(speeds));
+      c.baseCount++;
+      if (t >= cfg.base && c.baseCount >= 3) { finishBaseline(c, sc); checkAllBase(); }
+      changed = true;
+    } else if (S.phase === "watch") {
+      // 붕괴: 아주 빠른 칸이 일정 비율 이상, 두 번 연속
+      if (c.collapseAuto == null && S.collapseAuto == null && S.collapseManual == null) {
+        if (fast >= cfg.colFrac) {
+          c.crun++; if (c.crun === 1) c.crunStart = t;
+          if (c.crun >= 2) {
+            c.collapseAuto = c.crunStart;
+            S.collapseAuto = c.crunStart; S.colCam = c.i;
+            if (S.precursor == null) { S.precursor = c.run > 0 ? c.runStart : c.collapseAuto; S.preCam = c.i; S.noPrecursor = c.run === 0; }
+            changed = true; beep(330, 500);
+          }
+        } else c.crun = 0;
+      }
+      // 전조: 움직이는 칸 비율이 경보선을 연속으로 넘음
+      if (c.precursor == null) {
+        if (frac >= c.fracThr) {
+          c.run++; if (c.run === 1) c.runStart = t;
+          if (c.run >= cfg.consec) {
+            c.precursor = c.runStart;
+            if (S.precursor == null) {
+              S.precursor = c.runStart; S.preCam = c.i; changed = true;
+              beep(880, 250); setTimeout(function () { beep(880, 250); }, 350);
+            }
+          }
+        } else c.run = 0;
+      }
+      // 역속도법: 전조를 먼저 잡은 카메라에서 움직이는 칸들의 평균 속도
+      if (S.precursor != null && collapseT() == null && S.preCam === c.i) {
+        var mv = moving ? moveSum / moving : 0;
+        S.ema = S.ema == null ? mv : 0.4 * mv + 0.6 * S.ema;
+        if (S.ema > thr) {
+          var ip = { t: t, y: 1 / S.ema };
+          S.inv.push(ip); S.pendInv = ip;
+          var recent = S.inv.slice(-12);
+          if (recent.length >= 5) {
+            var f = linFit(recent.map(function (p) { return p.t; }), recent.map(function (p) { return p.y; }));
+            S.pred = (f && f.a < 0) ? -f.b / f.a : null;
+            if (S.pred != null && (S.pred < t - 1 || S.pred > t + 3600)) S.pred = null;
+          }
+        }
+      }
+    }
+    updateReadouts();
+    if (changed) refreshUI(); else { setMood(); updateBanner(); pushState(false); cloudLive(false); }
+    drawOverlay(c);
+  }
+  function finishBaseline(c, sc) {
+    var cfg = S.cfg;
+    // 칸 하나가 잡음만으로 넘기 어려운 속도 = 잡음 속도의 99.5% 지점 × 1.25
+    var floor = 0.15 * sc / (cfg.interval / 1000);
+    c.blockThr = Math.max(percentile(c.baseAll, 0.995) * 1.25, floor);
+    var fr = c.baseSnaps.map(function (a) { var k = 0; for (var i = 0; i < a.length; i++) if (a[i] > c.blockThr) k++; return a.length ? k / a.length : 0; });
+    var st = meanSd(fr);
+    c.baseFrac = st;
+    c.fracThr = Math.min(0.5, Math.max(st.m + cfg.k * st.s, st.m * 2, 0.03));
+    c.baseAll = []; c.baseSnaps = []; c.baseDone = true;
+    c.blocks.forEach(function (b) { b.cumX = 0; b.cumY = 0; });
+  }
+  function checkAllBase() {
+    if (!S.running || S.phase !== "baseline") return;
+    var act = activeCams();
+    if (!act.length) { setNotice("카메라 영상이 멈췄어요. 카메라 연결을 확인하고 다시 시작해 주세요.", "err"); stopWatch(null); return; }
+    if (act.every(function (c) { return c.baseDone; })) { S.phase = "watch"; beep(660, 120); refreshUI(); }
+  }
+  // 흔들림 학습이 끝나지 않는 카메라(영상 멈춤 등)는 빼고 진행한다
+  setInterval(function () {
+    if (!S.running) return;
+    if (S.phase === "baseline") {
+      var t = globalT(), dropped = [];
+      activeCams().forEach(function (c) {
+        if (!c.baseDone && t > S.cfg.base + 8) { c.active = false; clearTimeout(c.timer); dropped.push(c.name); }
+      });
+      if (dropped.length) setNotice(dropped.join(", ") + " 카메라 영상이 들어오지 않아 그 카메라는 빼고 감시해요.", "err");
+      checkAllBase();
+      refreshUI();
+    }
+  }, 1000);
+  function markCollapse() {
+    if (!S.running || S.phase === "baseline") return;
+    S.collapseManual = globalT();
+    if (S.precursor == null) { S.precursor = S.collapseManual; S.noPrecursor = true; }
+    beep(330, 300);
+    updateReadouts();
+    refreshUI();
+  }
+  function updateReadouts() {
+    CAMS.forEach(function (c) {
+      var s = c.samples[c.samples.length - 1];
+      $("roFrac" + c.i).textContent = !c.ready && !c.active ? "꺼짐" : (s && s.frac != null ? pct(s.frac) : (S.running && !c.baseDone ? "학습 중" : "–"));
+    });
+    var vs = null, t = null, cum = null;
+    activeCams().forEach(function (c) { var s = c.samples[c.samples.length - 1]; if (s) { vs = Math.max(vs || 0, s.vs); t = Math.max(t || 0, s.t); cum = Math.max(cum || 0, s.cum); } });
+    $("roSpeed").textContent = vs != null ? fmtN(vs, vs < 1 ? 3 : 2) : "–";
+    $("roThr").textContent = "경보선: " + (CAMS.filter(function (c) { return c.fracThr != null; }).map(function (c) { return c.name + " " + pct(c.fracThr); }).join(" · ") || (S.running ? "학습 중" : "–"));
+    $("roTime").textContent = S.running ? fmtT(globalT()) : (t != null ? fmtT(t) : "–");
+    $("roPre").textContent = fmtT(S.precursor);
+    var col = collapseT();
+    $("roCol").textContent = col != null ? fmtT(col) : "–";
+    $("roPred").textContent = fmtT(S.pred);
+    $("roCum").textContent = "쌓인 움직임: " + (cum != null ? fmtN(cum, 2) + " " + unitD() : "–") + " · 속도 단위 " + unitV();
+    var L = leadT();
+    $("roLead").textContent = L != null ? L.toFixed(1) + "초" : "–";
+    $("roLeadNote").hidden = !(L != null && S.noPrecursor);
+    var g = $("gFill"), r = maxRatio();
+    if (S.running && S.phase === "watch") {
+      g.style.width = Math.min(100, r * 50).toFixed(1) + "%";
+      g.setAttribute("data-lv", (S.cfg && maxFast() >= S.cfg.colFrac) ? "2" : r >= 1 ? "1" : "0");
+    } else { g.style.width = "0%"; g.setAttribute("data-lv", "0"); }
+  }
+  async function stopWatch(note) {
+    if (!S.running) return;
+    S.running = false;
+    CAMS.forEach(function (c) { clearTimeout(c.timer); c.timer = null; c.busy = false; if (S.mode === "file") { try { c.video.pause(); } catch (e) {} } });
+    try { if (S.wake) await S.wake.release(); } catch (e) {} S.wake = null;
+    CAMS.forEach(stopRecorder);
+    var any = CAMS.some(function (c) { return c.baseDone && c.samples.length > 1; });
+    var L = leadT(), msg = note ? note + " " : "";
+    if (!any) msg += "흔들림 학습이 끝나기 전에 멈춰서 판정을 못 했어요. 다시 시작해 주세요.";
+    else if (L != null) msg += "대피 가능 시간은 " + L.toFixed(1) + "초예요. 기록하면 아래 표에 쌓이고 조건별 평균이 계산돼요.";
+    else if (S.precursor != null) msg += "전조는 잡혔지만 붕괴 시점이 없어요. 다음에는 흙이 무너질 때 빨간 버튼을 눌러 주세요.";
+    else msg += "전조가 감지되지 않았어요. 흙이 무너지지 않았다면 그대로 기록해도 돼요.";
+    S.doneMsg = msg;
+    S.phase = any ? "done" : "ready";
+    if (!any) setNotice(msg, "err");
+    updateReadouts(); refreshUI(); CAMS.forEach(drawOverlay);
+  }
+
+  // ---------- 녹화 ----------
+  function startRecorder(c) {
+    c.rec = null; c.recChunks = [];
+    if (!$("recOn").checked || !c.stream || typeof MediaRecorder === "undefined") return;
+    var types = ["video/mp4", "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"], mime = "";
+    for (var i = 0; i < types.length; i++) { try { if (MediaRecorder.isTypeSupported(types[i])) { mime = types[i]; break; } } catch (e) {} }
+    try {
+      c.rec = mime ? new MediaRecorder(c.stream, { mimeType: mime }) : new MediaRecorder(c.stream);
+      c.recMime = c.rec.mimeType || mime || "video/webm";
+      c.rec.ondataavailable = function (e) { if (e.data && e.data.size) c.recChunks.push(e.data); };
+      c.rec.onstop = function () {
+        if (!c.recChunks.length) return;
+        var ext = c.recMime.indexOf("mp4") >= 0 ? "mp4" : "webm";
+        var name = "slope-" + ($("condSel").value || "run") + "-" + c.name + "-" + stamp() + "." + ext;
+        if (!download(name, new Blob(c.recChunks, { type: c.recMime }))) setNotice("녹화 파일을 저장하지 못했어요.", "err");
+        c.recChunks = [];
+      };
+      c.rec.start(1000);
+    } catch (e) { c.rec = null; }
+  }
+  function stopRecorder(c) {
+    try { if (c.rec && c.rec.state !== "inactive") c.rec.stop(); } catch (e) {}
+    c.rec = null;
+  }
+
+  // ---------- 기록 ----------
+  function loadRuns() {
+    try { var raw = localStorage.getItem(LS_KEY); var a = raw ? JSON.parse(raw) : []; S.runs = Array.isArray(a) ? a : []; } catch (e) { S.runs = []; }
+  }
+  function saveRuns() { try { localStorage.setItem(LS_KEY, JSON.stringify(S.runs)); } catch (e) {} }
+  function saveCurrentRun() {
+    if (S.saved || !CAMS.some(function (c) { return c.samples.length > 1; })) return;
+    var c0 = CAMS[0], c1 = CAMS[1];
+    S.runs.push({
+      cond: $("condSel").value, name: $("trialName").value.trim(), date: new Date().toISOString().slice(0, 16).replace("T", " "),
+      pre: S.precursor, col: collapseT(), colManual: S.collapseManual != null, lead: leadT(), pred: S.pred,
+      preCam: S.preCam != null ? CAMS[S.preCam].name : "", colCam: S.collapseManual != null ? "버튼" : (S.colCam != null ? CAMS[S.colCam].name : ""),
+      maxCum: Math.max(c0.maxCum, c1.maxCum), unit: unitD(), mmPerPx: c0.mmPerPx, mmPerPx1: c1.mmPerPx,
+      fracThr: c0.fracThr, fracThr1: c1.fracThr, blockThr: c0.blockThr, blockThr1: c1.blockThr,
+      cams: activeCams().map(function (c) { return c.name; }).join("+") || readyCams().map(function (c) { return c.name; }).join("+"),
+      k: S.cfg ? S.cfg.k : null, noPre: S.noPrecursor
+    });
+    saveRuns(); renderRuns();
+    S.saved = true;
+    S.doneMsg = "아래 ‘실험 기록’ 표에 추가했어요. 같은 조건으로 3회 이상 반복하면 평균과 표준편차가 계산돼요. 흙을 새로 준비한 뒤 ‘새로 감시 시작’을 누르세요.";
+    refreshUI();
+  }
+  function renderRuns() {
+    var tb = $("runBody"); tb.innerHTML = "";
+    if (!S.runs.length) {
+      tb.innerHTML = '<tr class="empty-row"><td colspan="10">아직 기록이 없어요. 감시를 마친 뒤 ‘이 결과 기록하기’를 누르면 여기에 쌓여요. 기록은 이 브라우저에만 저장되니 실험이 끝나면 CSV로 내보내 두세요.</td></tr>';
+    }
+    S.runs.forEach(function (r, i) {
+      var tr = document.createElement("tr");
+      function td(text, isNum) { var d = document.createElement("td"); d.textContent = text; if (isNum) d.className = "n"; tr.appendChild(d); }
+      td(r.cond); td((r.name || "") + (r.cams ? " (" + r.cams + ")" : "")); td(r.date);
+      td(fmtN(r.pre, 1) + (r.preCam ? " " + r.preCam : ""), true); td(r.col != null ? fmtN(r.col, 1) + (r.colManual ? "*" : "") : "–", true);
+      td(r.lead != null ? fmtN(r.lead, 1) : "–", true); td(fmtN(r.pred, 1), true);
+      td(fmtN(r.maxCum, 2) + " " + (r.unit || ""), true); td(r.mmPerPx ? "mm" : "픽셀", true);
+      var dcell = document.createElement("td"), btn = document.createElement("button");
+      btn.type = "button"; btn.textContent = "삭제";
+      btn.addEventListener("click", function () {
+        if (btn.dataset.armed === "1") { S.runs.splice(i, 1); saveRuns(); renderRuns(); pushState(true); }
+        else { btn.dataset.armed = "1"; btn.textContent = "한 번 더 눌러 삭제"; btn.className = "danger"; setTimeout(function () { if (btn.isConnected) { btn.dataset.armed = ""; btn.textContent = "삭제"; btn.className = ""; } }, 3000); }
+      });
+      dcell.appendChild(btn); tr.appendChild(dcell); tb.appendChild(tr);
+    });
+    var sb = $("sumBody"); sb.innerHTML = "";
+    var groups = {}, order = [];
+    S.runs.forEach(function (r) { if (!groups[r.cond]) { groups[r.cond] = []; order.push(r.cond); } groups[r.cond].push(r); });
+    S.runsSum = [];
+    if (!order.length) { sb.innerHTML = '<tr class="empty-row"><td colspan="5">조건별로 3회 이상 기록하면 대피 가능 시간의 평균과 표준편차를 비교할 수 있어요. (* = 버튼으로 표시한 붕괴)</td></tr>'; return; }
+    order.forEach(function (k) {
+      var g = groups[k], leads = g.map(function (r) { return r.lead; }).filter(function (x) { return x != null && isFinite(x); });
+      var pres = g.map(function (r) { return r.pre; }).filter(function (x) { return x != null && isFinite(x); });
+      var cols = g.map(function (r) { return r.col; }).filter(function (x) { return x != null && isFinite(x); });
+      var ml = meanSd(leads), mp = meanSd(pres), mc = meanSd(cols);
+      S.runsSum.push({ cond: k, n: leads.length, mean: leads.length ? ml.m : null, sd: leads.length ? ml.s : null });
+      var tr = document.createElement("tr");
+      [[k, false], [String(g.length), true], [leads.length ? ml.m.toFixed(1) + " ± " + ml.s.toFixed(1) + " (n=" + leads.length + ")" : "–", true],
+       [pres.length ? mp.m.toFixed(1) : "–", true], [cols.length ? mc.m.toFixed(1) : "–", true]].forEach(function (p) {
+        var d = document.createElement("td"); d.textContent = p[0]; if (p[1]) d.className = "n"; tr.appendChild(d);
+      });
+      sb.appendChild(tr);
+    });
+  }
+  function exportRuns() {
+    if (!S.runs.length) { setNotice("내보낼 기록이 없어요.", "err"); return; }
+    var head = ["조건", "회차·카메라", "날짜", "사용 카메라", "전조(s)", "전조 잡은 카메라", "붕괴(s)", "붕괴 판정", "대피가능시간(s)", "예측붕괴(s)", "최대쌓인움직임", "단위",
+      "측면 mm/px", "위쪽 mm/px", "측면 경보선(칸 비율)", "위쪽 경보선(칸 비율)", "측면 칸 경보선 속도", "위쪽 칸 경보선 속도", "k", "경보없이붕괴"];
+    var rows = S.runs.map(function (r) {
+      return [r.cond, r.name, r.date, r.cams, r.pre, r.preCam, r.col, r.colCam || (r.colManual ? "버튼" : ""), r.lead, r.pred, r.maxCum, r.unit,
+        r.mmPerPx, r.mmPerPx1, r.fracThr, r.fracThr1, r.blockThr, r.blockThr1, r.k, r.noPre ? "예" : ""];
+    });
+    var csv = "﻿" + [head].concat(rows).map(function (r) { return r.map(csvCell).join(","); }).join("\n");
+    if (!download("slope-runs-" + stamp() + ".csv", new Blob([csv], { type: "text/csv;charset=utf-8" }))) setNotice("파일을 저장하지 못했어요.", "err");
+  }
+  function exportSeries() {
+    var head = ["카메라", "시간(s)", "움직이는 칸 비율", "빠른 칸 비율", "속도 상위10%", "움직이는 칸 평균 속도", "쌓인 움직임", "속도 단위", "유효 칸 수"];
+    var rows = [];
+    CAMS.forEach(function (c) {
+      c.samples.forEach(function (s) { rows.push([c.name, s.t.toFixed(3), s.frac == null ? "" : s.frac.toFixed(4), s.fast == null ? "" : s.fast.toFixed(4), s.vs.toFixed(5), s.mv.toFixed(5), s.cum.toFixed(4), unitV(c), s.n]); });
+    });
+    if (!rows.length) return;
+    var meta = [["조건", $("condSel").value], ["회차·카메라", $("trialName").value], ["전조(s)", S.precursor], ["전조 잡은 카메라", S.preCam != null ? CAMS[S.preCam].name : ""], ["붕괴(s)", collapseT()], ["대피가능시간(s)", leadT()], ["예측붕괴(s)", S.pred],
+      ["측면 경보선(칸 비율)", CAMS[0].fracThr], ["위쪽 경보선(칸 비율)", CAMS[1].fracThr], ["칸 크기(px)", S.cfg ? S.cfg.B : ""], []];
+    var csv = "﻿" + meta.concat([head]).concat(rows).map(function (r) { return r.map(csvCell).join(","); }).join("\n");
+    if (!download("slope-series-" + stamp() + ".csv", new Blob([csv], { type: "text/csv;charset=utf-8" }))) setNotice("파일을 저장하지 못했어요.", "err");
+  }
+
+  // ---------- 관람객 앱 연동 (Firebase) ----------
+  var CL = { db: null, auth: null, user: null, online: false, offset: 0, last: 0, trail: null, alert: null, runId: null, sentPre: false, sentCol: false, stopAt: 0 };
+  function cleanVal(v) {
+    if (v === undefined) return null;
+    if (typeof v === "number") return isFinite(v) ? v : null;
+    if (Array.isArray(v)) return v.map(cleanVal);
+    if (v && typeof v === "object") { var o = {}; Object.keys(v).forEach(function (k) { var x = cleanVal(v[k]); if (x !== null) o[k] = x; }); return o; }
+    return v;
+  }
+  function cloudStatus() {
+    var p = $("cloudPill"), on = !!(CL.user && CL.online);
+    p.textContent = !CL.db ? "설정 필요" : !CL.user ? "로그인 필요" : CL.online ? "실시간 전송 중" : "다시 연결 중";
+    p.classList.toggle("on", on);
+    $("loginRow").hidden = !!CL.user || !CL.db;
+    $("cloudActs").hidden = !CL.user;
+  }
+  function cloudInit() {
+    var cfg = window.SOLVAY_FIREBASE;
+    if (!window.firebase || !cfg || !cfg.apiKey || !cfg.databaseURL) {
+      $("cloudNote").textContent = window.firebase ? "firebase-config.js에 Firebase 설정값을 넣으면 관람객 앱이 연결돼요. 지금은 이 노트북 안에서만 작동해요." : "Firebase를 불러오지 못했어요 (인터넷 연결 확인). 실험 감시와 2번 화면은 그대로 작동해요.";
+      cloudStatus(); return;
+    }
+    try {
+      var app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
+      CL.db = firebase.database(app); CL.auth = firebase.auth(app);
+      CL.db.ref(".info/connected").on("value", function (sn) { CL.online = !!sn.val(); cloudStatus(); });
+      CL.db.ref(".info/serverTimeOffset").on("value", function (sn) { CL.offset = +sn.val() || 0; });
+      CL.auth.onAuthStateChanged(function (u) {
+        CL.user = u || null; cloudStatus();
+        if (u) {
+          $("cloudNote").textContent = "로그인됨 (" + (u.email || "관리자") + "). 실험 상황이 관람객 폰으로 전송되고 있어요.";
+          CL.db.ref("solvay/live/alert").once("value").then(function (sn) { var a = sn.val(); if (a && typeof a.seq === "number" && (!CL.alert || a.seq > CL.alert.seq)) CL.alert = a; cloudLive(true); }).catch(function () { cloudLive(true); });
+          CL.db.ref("solvay/viewers").on("value", function (sn) { $("viewers").textContent = "지금 경보를 받는 폰: " + (sn.numChildren ? sn.numChildren() : 0) + "대"; }, function () {});
+        } else {
+          $("cloudNote").textContent = "관리자 계정으로 로그인하면 실험 상황과 전조·붕괴 경보가 관람객 폰으로 실시간 전송돼요.";
+          try { CL.db.ref("solvay/viewers").off(); } catch (e) {}
+        }
+      });
+    } catch (e) { CL.db = null; $("cloudNote").textContent = "Firebase 연결에 실패했어요. firebase-config.js 값을 확인해 주세요."; }
+    cloudStatus();
+  }
+  function cloudObj() {
+    var st = stateObj(), c0 = CAMS[0], c1 = CAMS[1];
+    var s0 = c0.samples[c0.samples.length - 1], s1 = c1.samples[c1.samples.length - 1];
+    return cleanVal({
+      runId: st.runId, mood: st.mood, say: st.say, K: st.K, T: st.T, tone: st.tone, running: st.running, phase: st.phase,
+      pre: st.pre, col: st.col, lead: st.lead, noPre: st.noPre, pred: st.pred, ratio: st.ratio, elapsed: st.elapsed,
+      cond: st.cond, name: st.name, thr0: c0.fracThr, thr1: c1.fracThr, runsSum: st.runsSum,
+      s: (s0 || s1) ? { t0: s0 ? s0.t : null, f0: s0 ? s0.frac : null, t1: s1 ? s1.t : null, f1: s1 ? s1.frac : null } : null,
+      alert: CL.alert, ts: Date.now() + CL.offset
+    });
+  }
+  function newAlert(type) {
+    CL.alert = { seq: (CL.alert && typeof CL.alert.seq === "number" ? CL.alert.seq : 0) + 1, type: type, at: Date.now() + CL.offset };
+  }
+  function cloudLive(force) {
+    if (!CL || !CL.db || !CL.user) return;
+    var urgent = false;
+    if (S.runId !== CL.runId) { CL.runId = S.runId; CL.sentPre = false; CL.sentCol = false; }
+    if (S.running && S.precursor != null && !CL.sentPre) { CL.sentPre = true; if (collapseT() == null) { newAlert("pre"); urgent = true; } }
+    if ((S.running || S.phase === "done") && collapseT() != null && !CL.sentCol) { CL.sentCol = true; CL.sentPre = true; newAlert("col"); urgent = true; }
+    var now = Date.now();
+    if (!urgent) {
+      var gap = force ? 250 : 1000;
+      if (now - CL.last < gap) {
+        if (!CL.trail) CL.trail = setTimeout(function () { CL.trail = null; cloudLive(true); }, gap - (now - CL.last) + 20);
+        return;
+      }
+    }
+    CL.last = now;
+    try { CL.db.ref("solvay/live").set(cloudObj()).catch(function () {}); } catch (e) {}
+  }
+  function downs(arr) {
+    var step = Math.max(1, Math.ceil(arr.length / 400)), out = [];
+    for (var i = 0; i < arr.length; i += step) { var s = arr[i]; if (s && s.frac != null && isFinite(s.frac)) out.push([+s.t.toFixed(2), +s.frac.toFixed(4)]); }
+    return out;
+  }
+  setInterval(function () {
+    if (!CL.db || !CL.user) return;
+    if (S.running) CL.stopAt = Date.now();
+    if (!S.running && Date.now() - CL.stopAt > 12000) return;
+    try { CL.db.ref("solvay/series").set({ runId: S.runId, c0: downs(CAMS[0].samples), c1: downs(CAMS[1].samples) }).catch(function () {}); } catch (e) {}
+  }, 5000);
+  function appUrl() { try { return new URL("app.html", location.href).href; } catch (e) { return "app.html"; } }
+  function showQr() {
+    var url = appUrl(), box = $("qr");
+    $("qrUrl").textContent = url;
+    box.innerHTML = "";
+    try { if (window.QRCode) new QRCode(box, { text: url, width: 360, height: 360, correctLevel: QRCode.CorrectLevel.M }); else box.textContent = "QR 도구를 불러오지 못했어요. 아래 주소를 직접 입력하게 안내해 주세요."; }
+    catch (e) { box.textContent = "QR을 만들지 못했어요. 아래 주소를 안내해 주세요."; }
+    $("qrModal").hidden = false;
+  }
+  $("cloudLogin").addEventListener("click", function () {
+    if (!CL.auth) return;
+    var em = $("cloudEmail").value.trim(), pw = $("cloudPw").value;
+    if (!em || !pw) { $("cloudNote").textContent = "이메일과 비밀번호를 모두 입력해 주세요."; return; }
+    $("cloudNote").textContent = "로그인 중…";
+    CL.auth.signInWithEmailAndPassword(em, pw).then(function () { $("cloudPw").value = ""; }).catch(function (e) {
+      var code = e && e.code || "";
+      $("cloudNote").textContent = /wrong-password|invalid-credential|user-not-found|invalid-login/.test(code) ? "이메일이나 비밀번호가 맞지 않아요." : /network/.test(code) ? "인터넷 연결을 확인해 주세요." : "로그인하지 못했어요 (" + code + ").";
+    });
+  });
+  $("cloudPw").addEventListener("keydown", function (e) { if (e.key === "Enter") $("cloudLogin").click(); });
+  $("cloudLogout").addEventListener("click", function () { try { CL.auth.signOut(); } catch (e) {} });
+  $("testAlert").addEventListener("click", function () { if (!CL.user) return; newAlert("test"); CL.last = 0; cloudLive(true); $("cloudNote").textContent = "시험 경보를 보냈어요. 관람객 폰에 파란 시험 경보가 떴는지 확인해 보세요."; });
+  $("qrBtn").addEventListener("click", showQr);
+  $("qrClose").addEventListener("click", function () { $("qrModal").hidden = true; });
+  $("qrModal").addEventListener("click", function (e) { if (e.target === $("qrModal")) $("qrModal").hidden = true; });
+
+  // ---------- 이벤트 ----------
+  $("primaryBtn").addEventListener("click", function () {
+    if (S.running) { stopWatch(null); return; }
+    if (!anyReady()) { if (S.mode === "cam") startCameras(); else $("fileInput0").click(); return; }
+    startWatch();
+  });
+  $("collapseBtn").addEventListener("click", markCollapse);
+  $("saveBtn").addEventListener("click", saveCurrentRun);
+  $("openDisplay").addEventListener("click", function () {
+    var w = null;
+    try { w = window.open("display.html", "solvay-display", "popup,width=1280,height=800"); } catch (e) { w = null; }
+    if (!w) setNotice("새 창이 막혔어요. 같은 브라우저 새 탭에서 이 주소 끝을 display.html로 바꿔 여세요.", "err");
+  });
+  $("modeCam").addEventListener("click", function () { setMode("cam"); });
+  $("modeFile").addEventListener("click", function () { setMode("file"); });
+  $("camOff").addEventListener("click", function () {
+    if (S.running) return;
+    CAMS.forEach(stopCam); S.phase = "idle"; endTool();
+    layoutStages(); refreshUI();
+  });
+  $("fileAgain").addEventListener("click", function () { if (!S.running) $("fileInput0").click(); });
+  $("fileAdd1").addEventListener("click", function () { if (!S.running) $("fileInput1").click(); });
+  [0, 1].forEach(function (k) {
+    $("fileInput" + k).addEventListener("change", function (e) { var f = e.target.files && e.target.files[0]; onFile(CAMS[k], f); try { e.target.value = ""; } catch (x) {} });
+  });
+  $("toolRoi").addEventListener("click", function () { setTool("roi"); });
+  $("toolCal").addEventListener("click", function () { setTool("cal"); });
+  $("resetRoi").addEventListener("click", function () {
+    if (S.running) return;
+    CAMS.forEach(function (c) { c.roi = null; c.calPts = []; c.mmPerPx = null; c.blocks = []; c.grid = null; });
+    endTool(); updateLimitHint(); CAMS.forEach(drawOverlay); refreshUI();
+  });
+  $("calMm").addEventListener("input", function () { CAMS.forEach(function (c) { if (c.calPts.length === 2) computeCal(c); }); updateCalOut(); });
+  ["setInterval", "setRadius", "setBlock"].forEach(function (id) { $(id).addEventListener("input", updateLimitHint); });
+  $("setBase").addEventListener("input", function () { if (!S.running) refreshUI(); });
+  $("setRes").addEventListener("change", function () { if (!S.running) { readyCams().forEach(onSourceReady); refreshUI(); } });
+  $("showArrows").addEventListener("change", function () { CAMS.forEach(drawOverlay); });
+  $("condSel").addEventListener("change", function () { pushState(true); });
+  $("trialName").addEventListener("input", function () { pushState(true); });
+  $("csvSeries").addEventListener("click", exportSeries);
+  $("csvRuns").addEventListener("click", exportRuns);
+  $("clearRuns").addEventListener("click", function () {
+    var b = $("clearRuns");
+    if (b.dataset.armed === "1") { S.runs = []; saveRuns(); renderRuns(); pushState(true); b.dataset.armed = ""; b.textContent = "기록 모두 지우기"; b.className = ""; }
+    else { b.dataset.armed = "1"; b.textContent = "한 번 더 누르면 모두 지워져요"; b.className = "danger"; setTimeout(function () { b.dataset.armed = ""; b.textContent = "기록 모두 지우기"; b.className = ""; }, 3000); }
+  });
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+    try { navigator.mediaDevices.addEventListener("devicechange", listCams); } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && S.running) setNotice("1번 화면이 가려지면 분석이 느려지거나 멈춰요. 감시 중에는 이 창을 1번 모니터에 띄워 두세요.", "err");
+  });
+  var rz = null;
+  window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(function () { CAMS.forEach(drawOverlay); }, 150); });
+
+  // ---------- 시작 ----------
+  loadRuns(); renderRuns(); updateLimitHint(); listCams(); layoutStages(); updateReadouts(); cloudInit(); refreshUI();
+  window.__slopeWatchTest = { engineFactory: engineFactory, percentile: percentile, meanSd: meanSd, linFit: linFit, S: S, CAMS: CAMS };
+})();
+</script>
+</body>
+</html>
