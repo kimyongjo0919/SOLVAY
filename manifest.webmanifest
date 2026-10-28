@@ -1,0 +1,16 @@
+{
+  "name": "SOLVAY 산사태 경보 (모의)",
+  "short_name": "SOLVAY 경보",
+  "description": "Team SOLVAY 산사태 실험과 연동되는 모의 경보 체험 앱",
+  "start_url": "app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef6ea",
+  "theme_color": "#3f8f4a",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
