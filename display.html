@@ -131,6 +131,11 @@ body[data-done] .banner.col { animation: none; }
 .ld3d { left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: var(--font-display); font-size: clamp(18px, 1.6vw, 26px); color: var(--cyan); background: rgba(8, 12, 17, 0.85); border: 1px solid var(--cyan); padding: 10px 20px; border-radius: 10px; animation: blinkDot 1.2s infinite; }
 #saveTerrain { border-color: var(--amber); color: var(--amber); }
 .cctv { position: absolute; right: 18px; top: 150px; width: min(30%, 400px); min-width: 220px; max-height: calc(100% - 230px); display: flex; flex-direction: column; z-index: 4; background: rgba(8, 12, 17, 0.9); border: 1px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.cctv-h { cursor: move; touch-action: none; user-select: none; }
+.cctv-h button { cursor: pointer; }
+.cctv.dragging { opacity: .92; box-shadow: 0 16px 40px rgba(0,0,0,.6), 0 0 0 2px var(--cyan); }
+.cctv-rs { position: absolute; right: 0; bottom: 0; width: 22px; height: 22px; cursor: nwse-resize; touch-action: none; z-index: 2;
+  background: linear-gradient(135deg, transparent 50%, rgba(62,197,255,.9) 50%, rgba(62,197,255,.9) 58%, transparent 58%, transparent 70%, rgba(62,197,255,.9) 70%, rgba(62,197,255,.9) 78%, transparent 78%); }
 .cctv-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 5px 6px 5px 10px; font-size: 13px; }
 .cctv-h b { flex: 1 1 110px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
 .cctv-h .cnt, .cctv-h .live { white-space: nowrap; }
@@ -285,10 +290,11 @@ body[data-done] .banner.col { animation: none; }
         <div class="cctv-h">
           <span class="live" id="cctvLive">● LIVE</span><b id="cctvName">도로 CCTV</b><span class="cnt" id="cctvCount"></span>
           <button type="button" id="cctvPrev" aria-label="이전 CCTV">◀</button><button type="button" id="cctvNext" aria-label="다음 CCTV">▶</button>
-          <button type="button" id="cctvGear" aria-label="CCTV 설정">⚙</button><button type="button" id="cctvClose" aria-label="닫기">✕</button>
+          <button type="button" id="cctvBig" aria-label="크게 보기" title="크게 보기 / 원래 크기">⤢</button><button type="button" id="cctvGear" aria-label="CCTV 설정">⚙</button><button type="button" id="cctvClose" aria-label="닫기">✕</button>
         </div>
         <div class="cctv-v"><video id="cctvVid" muted playsinline autoplay></video><div class="cctv-msg" id="cctvMsg" hidden></div></div>
         <div class="cctv-f">국가교통정보센터(ITS) 도로 CCTV · 산사태 판정과 무관한 참고 화면</div>
+        <div class="cctv-rs" id="cctvRs" title="끌어서 크기 조절"></div>
       </div>
       <div class="cctvset" id="cctvSet" hidden>
         <b>CCTV 설정 (선생님용)</b>
@@ -2556,18 +2562,49 @@ body[data-done] .banner.col { animation: none; }
     out.sort(function (a, b) { return (Math.pow(a.lat - s[0], 2) + Math.pow((a.lon - s[1]) * 0.8, 2)) - (Math.pow(b.lat - s[0], 2) + Math.pow((b.lon - s[1]) * 0.8, 2)); });
     return out.slice(0, 40);
   }
+  // ITS 응답 읽기: getType=json 이어도 XML로 올 때가 있어서 둘 다 처리
+  function ccParse(text) {
+    var t = String(text || "").trim(), list = [];
+    if (!t) return list;
+    if (t.charAt(0) === "{" || t.charAt(0) === "[") {
+      var j = JSON.parse(t), d = j && j.response && j.response.data;
+      if (d) list = Array.isArray(d) ? d : [d];
+      return list;
+    }
+    var doc = new DOMParser().parseFromString(t, "text/xml"), rows = doc.getElementsByTagName("data");
+    function tx(el, name) { var e = el.getElementsByTagName(name)[0]; return e ? (e.textContent || "").trim() : ""; }
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (!tx(r, "cctvurl")) continue;
+      list.push({ cctvname: tx(r, "cctvname"), coordx: tx(r, "coordx"), coordy: tx(r, "coordy"), cctvurl: tx(r, "cctvurl"), cctvformat: tx(r, "cctvformat") });
+    }
+    var code = doc.getElementsByTagName("resultCode")[0];
+    if (!list.length && code && code.textContent && code.textContent.trim() !== "0") throw new Error("ITS 응답 코드 " + code.textContent.trim());
+    return list;
+  }
+  function ccFetchText(url, ms) {
+    return new Promise(function (res, rej) {
+      var done = false, to = setTimeout(function () { if (!done) { done = true; rej(new Error("응답 없음")); } }, ms);
+      fetch(url).then(function (r) {
+        if (r.status === 401 || r.status === 403) throw new Error("인증키 오류 (HTTP " + r.status + ")");
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      }).then(function (t) { if (!done) { done = true; clearTimeout(to); res(t); } },
+        function (e) { if (!done) { done = true; clearTimeout(to); rej(e instanceof TypeError ? new Error("브라우저가 ITS 접속을 막았어요 (CORS)") : e); } });
+    });
+  }
   function ccFetchDirect(key) {
-    var all = [];
+    var all = [], why = [];
     function one(type, ct) {
       var url = "https://openapi.its.go.kr:9443/cctvInfo?apiKey=" + encodeURIComponent(key) + "&type=" + type + "&cctvType=" + ct +
         "&minX=" + CC_BOX.minX + "&maxX=" + CC_BOX.maxX + "&minY=" + CC_BOX.minY + "&maxY=" + CC_BOX.maxY + "&getType=json";
-      return fetchJSON(url, {}, 15000).then(function (j) { var d = j && j.response && j.response.data; return d ? (Array.isArray(d) ? d : [d]) : []; }, function () { return []; });
+      return ccFetchText(url, 15000).then(ccParse).catch(function (e) { why.push(e && e.message ? e.message : "오류"); return []; });
     }
     return one("ex", "4").then(function (a) { return a.length ? a : one("ex", "1"); }).then(function (a) {
       all = all.concat(a); return one("its", "4");
     }).then(function (a) { return a.length ? a : one("its", "1"); }).then(function (a) {
       all = all.concat(a);
-      if (!all.length) throw new Error("empty");
+      if (!all.length) throw new Error(why.length ? why[0] : "범위 안에 CCTV가 없어요");
       return all;
     });
   }
@@ -2598,15 +2635,16 @@ body[data-done] .banner.col { animation: none; }
     return CC.hlsP;
   }
   function ccStop() {
-    clearTimeout(CC.timer);
+    clearTimeout(CC.timer); clearTimeout(CC.retryT);
     if (CC.hls) { try { CC.hls.destroy(); } catch (e) {} CC.hls = null; }
     var v = $("cctvVid");
     if (v) { v.onplaying = v.onerror = null; try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {} }
     $("cctvLive").classList.remove("on");
   }
   function ccTryPlay(v) { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
-  function ccPlay(i, auto) {
+  function ccPlay(i, auto, attempt) {
     if (!CC.items.length) return;
+    attempt = attempt || 0;
     i = ((i % CC.items.length) + CC.items.length) % CC.items.length;
     CC.idx = i;
     var it = CC.items[i], v = $("cctvVid"), gen = ++CC.gen;
@@ -2618,8 +2656,16 @@ body[data-done] .banner.col { animation: none; }
     var usedHls = false;
     function fail(why) {
       if (gen !== CC.gen) return;
-      CC.tried[it.u] = 1; ccStop();
-      if (auto) ccNextAuto(); else ccMsg("이 CCTV는 지금 재생되지 않아요 (" + why + ") · ▶ 로 다른 CCTV를 보세요");
+      ccStop();
+      // ITS CCTV는 처음 부르면 영상 준비에 몇 초 걸릴 때가 있어서 잠시 뒤 다시 시도
+      var maxTry = auto ? 1 : 3;
+      if (attempt < maxTry) {
+        ccMsg("CCTV 영상을 준비하는 중… 잠시만요 (" + (attempt + 1) + "/" + maxTry + ")");
+        CC.retryT = setTimeout(function () { if (gen === CC.gen) ccPlay(i, auto, attempt + 1); }, 3500);
+        return;
+      }
+      CC.tried[it.u] = Date.now();
+      if (auto) ccNextAuto(); else ccMsg("이 CCTV는 지금 영상을 보내지 않아요 (" + why + ") · 잠시 뒤 다시 누르거나 ▶ 로 다른 CCTV를 보세요");
     }
     CC.timer = setTimeout(function () { fail("응답 없음"); }, 15000);
     v.onplaying = function () { if (gen !== CC.gen) return; clearTimeout(CC.timer); ccMsg(""); $("cctvLive").classList.add("on"); };
@@ -2643,7 +2689,8 @@ body[data-done] .banner.col { animation: none; }
   function ccNextAuto() {
     for (var k = 1; k <= CC.items.length; k++) {
       var j = (CC.idx + k) % CC.items.length;
-      if (!CC.tried[CC.items[j].u]) { ccPlay(j, true); return; }
+      var tt = CC.tried[CC.items[j].u];
+      if (!tt || Date.now() - tt > 120000) { ccPlay(j, true); return; } // 2분이 지난 CCTV는 다시 시도
     }
     if (!CC.refreshed) {
       CC.refreshed = true; ccMsg("영상 주소를 새로 받는 중…");
@@ -2692,7 +2739,66 @@ body[data-done] .banner.col { animation: none; }
       } catch (x) {}
     });
   }
-  function ccShow() { $("cctv").hidden = !(CC.open && CC.items.length); $("viewCctv").classList.toggle("on", !$("cctv").hidden); }
+  function ccShow() { $("cctv").hidden = !(CC.open && CC.items.length); $("viewCctv").classList.toggle("on", !$("cctv").hidden); ccLayout(false); }
+  // ---------- CCTV 창 옮기기 · 크기 조절 (제목줄 끌기 = 이동, 오른쪽 아래 모서리 끌기 = 크기, ⤢ 또는 영상 더블클릭 = 크게) ----------
+  function ccLayout(save) {
+    try {
+      var p = $("cctv"), sc = $("scene"); if (!p || !sc || p.hidden) return;
+      if (!CC.box) {
+        var sv = null; try { sv = JSON.parse(localStorage.getItem("solvay-cctv-box") || "null"); } catch (e) {}
+        if (sv && isFinite(sv.fx) && isFinite(sv.fy) && isFinite(sv.fw)) CC.box = { x: sv.fx * sc.clientWidth, y: sv.fy * sc.clientHeight, w: sv.fw * sc.clientWidth };
+        else return; // 기본 자리 (CSS)
+      }
+      var W = sc.clientWidth, H = sc.clientHeight, w = Math.max(220, Math.min(W - 8, CC.box.w));
+      p.style.right = "auto"; p.style.maxHeight = "none"; p.style.width = w + "px";
+      var h = p.offsetHeight;
+      if (h > H - 8) { w = Math.max(220, w - (h - (H - 8)) * 16 / 9); p.style.width = w + "px"; h = p.offsetHeight; }
+      var x = Math.max(4, Math.min(W - w - 4, CC.box.x)), y = Math.max(4, Math.min(H - h - 4, CC.box.y));
+      p.style.left = x + "px"; p.style.top = y + "px";
+      CC.box = { x: x, y: y, w: w };
+      if (save) { try { localStorage.setItem("solvay-cctv-box", JSON.stringify({ fx: x / W, fy: y / H, fw: w / W })); } catch (e) {} }
+    } catch (e) {}
+  }
+  function ccResetBox() {
+    var p = $("cctv"); CC.box = null; CC.prevBox = null;
+    p.style.left = p.style.top = p.style.width = p.style.right = p.style.maxHeight = "";
+    try { localStorage.removeItem("solvay-cctv-box"); } catch (e) {}
+  }
+  function ccBig() {
+    var p = $("cctv"), sc = $("scene"), W = sc.clientWidth, H = sc.clientHeight;
+    if (CC.big) { CC.big = false; if (CC.prevBox) { CC.box = CC.prevBox; ccLayout(true); } else ccResetBox(); }
+    else {
+      CC.big = true; CC.prevBox = CC.box ? { x: CC.box.x, y: CC.box.y, w: CC.box.w } : null;
+      var w = Math.min(W * 0.66, (H - 70) * 16 / 9);
+      CC.box = { x: (W - w) / 2, y: 60, w: w }; ccLayout(true);
+    }
+    $("cctvBig").textContent = CC.big ? "⤡" : "⤢";
+  }
+  function ccDragInit() {
+    var p = $("cctv"), hd = p.querySelector(".cctv-h"), rs = $("cctvRs"), st = null;
+    function start(e, mode) {
+      if (e.button != null && e.button !== 0) return;
+      st = { mode: mode, x: e.clientX, y: e.clientY, l: p.offsetLeft, t: p.offsetTop, w: p.offsetWidth, id: e.pointerId };
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {}
+      p.classList.add("dragging"); e.preventDefault(); e.stopPropagation();
+    }
+    function move(e) {
+      if (!st || e.pointerId !== st.id) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (st.mode === "move") CC.box = { x: st.l + dx, y: st.t + dy, w: st.w };
+      else CC.box = { x: st.l, y: st.t, w: st.w + Math.max(dx, dy * 16 / 9) };
+      CC.big = false; $("cctvBig").textContent = "⤢";
+      ccLayout(false);
+    }
+    function end(e) { if (!st || e.pointerId !== st.id) return; st = null; p.classList.remove("dragging"); ccLayout(true); }
+    hd.addEventListener("pointerdown", function (e) { if (e.target.closest && e.target.closest("button")) return; start(e, "move"); });
+    rs.addEventListener("pointerdown", function (e) { start(e, "size"); });
+    [hd, rs].forEach(function (el) { el.addEventListener("pointermove", move); el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end); });
+    hd.addEventListener("dblclick", function (e) { if (e.target.closest && e.target.closest("button")) return; CC.big = false; $("cctvBig").textContent = "⤢"; ccResetBox(); });
+    $("cctvVid").addEventListener("dblclick", ccBig);
+    $("cctvBig").addEventListener("click", ccBig);
+    window.addEventListener("resize", function () { setTimeout(function () { ccLayout(false); }, 200); });
+  }
   // ---------- 설정 (선생님용) ----------
   function ccSetup(open) {
     var box = $("cctvSet"); box.hidden = !open;
@@ -2718,6 +2824,7 @@ body[data-done] .banner.col { animation: none; }
   }
   function ccInit() {
     ccBindPick();
+    try { ccDragInit(); } catch (e) {}
     $("cctvPrev").addEventListener("click", function () { ccPlay(CC.idx - 1, false); });
     $("cctvNext").addEventListener("click", function () { ccPlay(CC.idx + 1, false); });
     $("cctvClose").addEventListener("click", function () { CC.open = false; ccStop(); ccShow(); });
