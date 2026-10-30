@@ -130,6 +130,26 @@ body[data-lv="4"]:not([data-done]) .scene::after { background: radial-gradient(e
 body[data-done] .banner.col { animation: none; }
 .ld3d { left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: var(--font-display); font-size: clamp(18px, 1.6vw, 26px); color: var(--cyan); background: rgba(8, 12, 17, 0.85); border: 1px solid var(--cyan); padding: 10px 20px; border-radius: 10px; animation: blinkDot 1.2s infinite; }
 #saveTerrain { border-color: var(--amber); color: var(--amber); }
+.cctv { position: absolute; right: 18px; top: 150px; width: min(30%, 400px); min-width: 220px; max-height: calc(100% - 230px); display: flex; flex-direction: column; z-index: 4; background: rgba(8, 12, 17, 0.9); border: 1px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.cctv-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 5px 6px 5px 10px; font-size: 13px; }
+.cctv-h b { flex: 1 1 110px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.cctv-h .cnt, .cctv-h .live { white-space: nowrap; }
+.cctv-h .cnt { font-family: var(--font-mono); color: var(--muted); font-size: 12px; }
+.cctv-h .live { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--dim); }
+.cctv-h .live.on { color: var(--red); animation: blinkDot 1.2s infinite; }
+.cctv-h button { border: 1px solid var(--line-2); background: var(--surface-3); color: var(--ink); border-radius: 6px; padding: 2px 7px; font-size: 12px; cursor: pointer; }
+.cctv-h button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+.cctv-v { position: relative; aspect-ratio: 16 / 9; background: #000; min-height: 0; flex: 0 1 auto; }
+.cctv-v video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.cctv-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 10px; font-size: 13px; color: var(--muted); background: rgba(0,0,0,.6); }
+.cctv-f { font-size: 11px; color: var(--muted); padding: 4px 10px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cctvset { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6; width: min(92%, 460px); background: var(--surface); border: 1px solid var(--amber); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; box-shadow: 0 20px 50px rgba(0,0,0,.6); }
+.cctvset label { display: flex; flex-direction: column; gap: 3px; color: var(--muted); }
+.cctvset input { font: inherit; color: var(--ink); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 6px; padding: 6px 8px; }
+.cctvset .row { display: flex; gap: 6px; flex-wrap: wrap; }
+.cctvset button { border: 1px solid var(--line-2); background: var(--surface-3); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; font: inherit; }
+.cctvset button#cctvSave { background: var(--cyan); color: var(--accent-ink); border-color: var(--cyan); }
+.cctvset p { margin: 0; color: var(--amber); min-height: 1.4em; }
 .cap { left: 18px; max-width: calc(100% - 300px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; bottom: 16px; font-size: clamp(12px, 0.85vw, 14px); background: rgba(8, 12, 17, 0.78); color: var(--muted); padding: 4px 12px; border-radius: 6px; border: 1px solid var(--line); }
 .dmg { right: 18px; bottom: 58px; font-family: var(--font-display); font-size: clamp(18px, 1.6vw, 28px); background: var(--red); color: #fff; padding: 6px 16px; border-radius: 10px; box-shadow: 0 0 30px -4px var(--red); }
 .evac { right: 18px; bottom: 58px; font-family: var(--font-body); font-weight: 700; font-size: clamp(15px, 1.2vw, 20px); background: rgba(47, 210, 122, 0.18); border: 1px solid var(--green); color: #b8f5d2; padding: 6px 14px; border-radius: 10px; backdrop-filter: blur(4px); }
@@ -219,6 +239,7 @@ body[data-done] .banner.col { animation: none; }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="cctv-config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="three.min.js"></script>
 <script>if (!window.THREE) { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>'); }</script>
@@ -254,11 +275,28 @@ body[data-done] .banner.col { animation: none; }
         <button type="button" id="viewZone">위험 사면 보기</button>
         <button type="button" id="viewAll">전체 보기</button>
         <button type="button" id="viewSchool" hidden>광남고 보기</button>
+        <button type="button" id="viewCctv">CCTV</button>
         <button type="button" id="viewQ">화질: 높음</button>
         <button type="button" id="saveTerrain" hidden>지형 파일 저장 (GitHub에 올리기)</button>
         <span class="hint" id="viewHint">끌기: 회전 · 휠: 확대 · 오른쪽 끌기(또는 Shift+끌기): 이동 · 더블클릭: 처음 시점</span>
       </div>
       <div class="ov cap" id="cap">경기도 광주시 남한산성 일대를 단순하게 표현한 모식도예요 (실제 지형·위치와 다름)</div>
+      <div class="cctv" id="cctv" hidden>
+        <div class="cctv-h">
+          <span class="live" id="cctvLive">● LIVE</span><b id="cctvName">도로 CCTV</b><span class="cnt" id="cctvCount"></span>
+          <button type="button" id="cctvPrev" aria-label="이전 CCTV">◀</button><button type="button" id="cctvNext" aria-label="다음 CCTV">▶</button>
+          <button type="button" id="cctvGear" aria-label="CCTV 설정">⚙</button><button type="button" id="cctvClose" aria-label="닫기">✕</button>
+        </div>
+        <div class="cctv-v"><video id="cctvVid" muted playsinline autoplay></video><div class="cctv-msg" id="cctvMsg" hidden></div></div>
+        <div class="cctv-f">국가교통정보센터(ITS) 도로 CCTV · 산사태 판정과 무관한 참고 화면</div>
+      </div>
+      <div class="cctvset" id="cctvSet" hidden>
+        <b>CCTV 설정 (선생님용)</b>
+        <label>Apps Script 웹 앱 주소<input type="url" id="cctvRelay" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
+        <label>또는 ITS 인증키 (이 컴퓨터에만 저장, GitHub에는 올라가지 않음)<input type="password" id="cctvKey" autocomplete="off"></label>
+        <div class="row"><button type="button" id="cctvSave">저장하고 연결</button><button type="button" id="cctvClear">지우기</button><button type="button" id="cctvSetClose">닫기</button></div>
+        <p id="cctvSetMsg"></p>
+      </div>
       <div class="ov ld3d" id="ld3d" hidden>실제 광주시 지형을 불러오는 중…</div>
       <div class="ov dmg" id="dmg" hidden>피해 주택 0채</div>
       <div class="ov evac" id="evac" hidden>주민 대피 중</div>
@@ -2488,6 +2526,228 @@ body[data-done] .banner.col { animation: none; }
     }).catch(function () { go(null); });
   }
   // =====================================================================
+  // 도로 CCTV (국가교통정보센터 ITS) — 참고 화면
+  //  · 목록: Apps Script 중계(인증키 숨김) → 없으면 이 컴퓨터에만 저장한 키로 직접
+  //  · 재생: https 실시간 영상(HLS). 안 되는 CCTV는 건너뛰고 다음 CCTV로
+  //  · 무엇이 실패해도 CCTV 창만 안내 문구로 바뀌고 다른 기능에는 영향 없음
+  // =====================================================================
+  var CC = { items: [], idx: -1, gen: 0, hls: null, hlsP: null, tried: {}, refreshed: false, timer: null, pins: [], open: true, loaded: false };
+  var HLS_URLS = ["https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js", "https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"];
+  var CC_BOX = { minX: 127.10, maxX: 127.36, minY: 37.33, maxY: 37.53 };
+  function ccCfg() {
+    var relay = "", key = "";
+    try { relay = (window.SOLVAY_CCTV && window.SOLVAY_CCTV.relay) || ""; } catch (e) {}
+    try { relay = localStorage.getItem("solvay-cctv-relay") || relay; key = localStorage.getItem("solvay-its-key") || ""; } catch (e) {}
+    return { relay: String(relay || "").trim(), key: String(key || "").trim() };
+  }
+  function ccMsg(t) { var m = $("cctvMsg"); if (!m) return; m.textContent = t || ""; m.hidden = !t; }
+  function ccNorm(list) {
+    var out = [], seen = {};
+    (Array.isArray(list) ? list : []).forEach(function (d) {
+      if (!d) return;
+      var x = parseFloat(d.x != null ? d.x : d.coordx), y = parseFloat(d.y != null ? d.y : d.coordy), u = String(d.u || d.cctvurl || "").trim();
+      if (!isFinite(x) || !isFinite(y) || !/^https?:\/\//i.test(u)) return;
+      if (x < CC_BOX.minX || x > CC_BOX.maxX || y < CC_BOX.minY || y > CC_BOX.maxY) return;
+      u = u.replace(/^http:\/\//i, "https://"); // 보안 연결(https) 주소만 재생 가능
+      if (seen[u]) return; seen[u] = 1;
+      out.push({ n: String(d.n || d.cctvname || "도로 CCTV").slice(0, 40), lat: y, lon: x, u: u, f: String(d.f || d.cctvformat || "") });
+    });
+    var s = PLACES.school;
+    out.sort(function (a, b) { return (Math.pow(a.lat - s[0], 2) + Math.pow((a.lon - s[1]) * 0.8, 2)) - (Math.pow(b.lat - s[0], 2) + Math.pow((b.lon - s[1]) * 0.8, 2)); });
+    return out.slice(0, 40);
+  }
+  function ccFetchDirect(key) {
+    var all = [];
+    function one(type, ct) {
+      var url = "https://openapi.its.go.kr:9443/cctvInfo?apiKey=" + encodeURIComponent(key) + "&type=" + type + "&cctvType=" + ct +
+        "&minX=" + CC_BOX.minX + "&maxX=" + CC_BOX.maxX + "&minY=" + CC_BOX.minY + "&maxY=" + CC_BOX.maxY + "&getType=json";
+      return fetchJSON(url, {}, 15000).then(function (j) { var d = j && j.response && j.response.data; return d ? (Array.isArray(d) ? d : [d]) : []; }, function () { return []; });
+    }
+    return one("ex", "4").then(function (a) { return a.length ? a : one("ex", "1"); }).then(function (a) {
+      all = all.concat(a); return one("its", "4");
+    }).then(function (a) { return a.length ? a : one("its", "1"); }).then(function (a) {
+      all = all.concat(a);
+      if (!all.length) throw new Error("empty");
+      return all;
+    });
+  }
+  function ccLoad(refresh) {
+    var c = ccCfg();
+    var p;
+    if (c.relay) p = fetchJSON(c.relay + (c.relay.indexOf("?") >= 0 ? "&" : "?") + (refresh ? "refresh=1&" : "") + "t=" + Date.now(), {}, 25000)
+      .then(function (j) { if (!j || !Array.isArray(j.items)) throw new Error((j && j.error) || "bad"); if (!j.items.length) throw new Error(j.error || "empty"); return j.items; })
+      .catch(function (e) { if (c.key) return ccFetchDirect(c.key); throw e; });
+    else if (c.key) p = ccFetchDirect(c.key);
+    else p = Promise.reject(new Error("no-config"));
+    return p.then(ccNorm);
+  }
+  function ccHls() {
+    if (window.Hls) return Promise.resolve(window.Hls);
+    if (CC.hlsP) return CC.hlsP;
+    CC.hlsP = new Promise(function (res, rej) {
+      var i = 0;
+      (function next() {
+        if (i >= HLS_URLS.length) { CC.hlsP = null; rej(new Error("hls")); return; }
+        var s = document.createElement("script"); s.src = HLS_URLS[i++]; s.async = true;
+        var to = setTimeout(function () { s.onload = s.onerror = null; next(); }, 12000);
+        s.onload = function () { clearTimeout(to); if (window.Hls) res(window.Hls); else next(); };
+        s.onerror = function () { clearTimeout(to); next(); };
+        document.head.appendChild(s);
+      })();
+    });
+    return CC.hlsP;
+  }
+  function ccStop() {
+    clearTimeout(CC.timer);
+    if (CC.hls) { try { CC.hls.destroy(); } catch (e) {} CC.hls = null; }
+    var v = $("cctvVid");
+    if (v) { v.onplaying = v.onerror = null; try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {} }
+    $("cctvLive").classList.remove("on");
+  }
+  function ccTryPlay(v) { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+  function ccPlay(i, auto) {
+    if (!CC.items.length) return;
+    i = ((i % CC.items.length) + CC.items.length) % CC.items.length;
+    CC.idx = i;
+    var it = CC.items[i], v = $("cctvVid"), gen = ++CC.gen;
+    ccStop();
+    $("cctvName").textContent = it.n;
+    $("cctvCount").textContent = (i + 1) + " / " + CC.items.length;
+    ccMsg("영상 불러오는 중…");
+    ccPinSel(i);
+    var usedHls = false;
+    function fail(why) {
+      if (gen !== CC.gen) return;
+      CC.tried[it.u] = 1; ccStop();
+      if (auto) ccNextAuto(); else ccMsg("이 CCTV는 지금 재생되지 않아요 (" + why + ") · ▶ 로 다른 CCTV를 보세요");
+    }
+    CC.timer = setTimeout(function () { fail("응답 없음"); }, 15000);
+    v.onplaying = function () { if (gen !== CC.gen) return; clearTimeout(CC.timer); ccMsg(""); $("cctvLive").classList.add("on"); };
+    function viaHls() {
+      usedHls = true;
+      ccHls().then(function (Hls) {
+        if (gen !== CC.gen) return;
+        if (!Hls.isSupported()) { fail("이 브라우저는 재생 불가"); return; }
+        var h = new Hls({ maxBufferLength: 8, liveSyncDurationCount: 2, manifestLoadingTimeOut: 10000, fragLoadingTimeOut: 15000, enableWorker: true });
+        CC.hls = h;
+        h.on(Hls.Events.ERROR, function (e, d) { if (d && d.fatal) fail("스트림 오류"); });
+        h.on(Hls.Events.MANIFEST_PARSED, function () { if (gen === CC.gen) ccTryPlay(v); });
+        h.loadSource(it.u); h.attachMedia(v);
+      }, function () { fail("재생기를 못 불러옴"); });
+    }
+    var isHls = /m3u8/i.test(it.u) || /hls|m3u8/i.test(it.f);
+    if (isHls && window.MediaSource) { viaHls(); return; } // 크롬·엣지·삼성인터넷: hls.js
+    v.onerror = function () { if (gen !== CC.gen) return; if (isHls && !usedHls && window.MediaSource) viaHls(); else fail("영상 오류"); };
+    v.src = it.u; ccTryPlay(v); // 사파리(기본 재생) 또는 mp4
+  }
+  function ccNextAuto() {
+    for (var k = 1; k <= CC.items.length; k++) {
+      var j = (CC.idx + k) % CC.items.length;
+      if (!CC.tried[CC.items[j].u]) { ccPlay(j, true); return; }
+    }
+    if (!CC.refreshed) {
+      CC.refreshed = true; ccMsg("영상 주소를 새로 받는 중…");
+      ccLoad(true).then(function (items) {
+        CC.items = items; CC.tried = {}; ccMakePins();
+        if (items.length) ccPlay(0, true); else ccMsg("지금은 볼 수 있는 CCTV가 없어요");
+      }, function () { ccMsg("지금은 볼 수 있는 CCTV가 없어요 (인터넷·중계 확인)"); });
+    } else ccMsg("지금은 재생되는 CCTV가 없어요. 나머지 화면은 그대로 작동해요.");
+  }
+  // ---------- 3D 지도 위 CCTV 표시 (실제 지형일 때) ----------
+  function ccClearPins() {
+    var t = T3;
+    CC.pins.forEach(function (p) {
+      try { if (t) { t.scene.remove(p.sp); t.scene.remove(p.ln); t.labels = t.labels.filter(function (L) { return L.sp !== p.sp; }); } p.sp.material.map.dispose(); p.sp.material.dispose(); } catch (e) {}
+    });
+    CC.pins = [];
+  }
+  function ccMakePins() {
+    ccClearPins();
+    var t = T3; if (!t || !t.real || !t.labelsMade) return;
+    CC.items.forEach(function (it, i) {
+      var p = geoToXZ(it.lat, it.lon); if (Math.abs(p.x) > 99 || Math.abs(p.z) > 99) return;
+      try {
+        var sp = makeLabel("CCTV", "#3ec5ff", 0.42), y = baseH(p.x, p.z) + 1.4;
+        sp.position.set(p.x, y, p.z); sp.userData.cctv = i; t.scene.add(sp);
+        var ln = addLeader(p.x, p.z, y - 0.4, "#3ec5ff");
+        t.labels.push({ sp: sp, s: 0.42 });
+        CC.pins.push({ sp: sp, ln: ln, i: i });
+      } catch (e) {}
+    });
+    ccPinSel(CC.idx);
+  }
+  function ccPinSel(i) { CC.pins.forEach(function (p) { try { p.sp.material.color.set(p.i === i ? 0xffc040 : 0xffffff); } catch (e) {} }); }
+  function ccBindPick() {
+    var cv = $("gl"), down = null;
+    cv.addEventListener("pointerdown", function (e) { down = { x: e.clientX, y: e.clientY }; });
+    cv.addEventListener("pointerup", function (e) {
+      if (!down || !CC.pins.length || !T3) return;
+      var moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
+      if (moved > 6) return;
+      try {
+        var r = cv.getBoundingClientRect(), m = new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        var rc = new THREE.Raycaster(); rc.setFromCamera(m, T3.camera);
+        var hit = rc.intersectObjects(CC.pins.map(function (p) { return p.sp; }), false);
+        if (hit.length) { CC.open = true; ccShow(); ccPlay(hit[0].object.userData.cctv, false); }
+      } catch (x) {}
+    });
+  }
+  function ccShow() { $("cctv").hidden = !(CC.open && CC.items.length); $("viewCctv").classList.toggle("on", !$("cctv").hidden); }
+  // ---------- 설정 (선생님용) ----------
+  function ccSetup(open) {
+    var box = $("cctvSet"); box.hidden = !open;
+    if (!open) return;
+    var c = ccCfg();
+    $("cctvRelay").value = c.relay; $("cctvKey").value = c.key ? "********" : "";
+    $("cctvSetMsg").textContent = c.relay ? "중계 주소가 있어요." : c.key ? "이 컴퓨터에 저장한 인증키로 직접 받아요." : "Apps Script 웹 앱 주소를 넣어 주세요.";
+  }
+  function ccStart(refresh) {
+    ccMsg("CCTV 목록 받는 중…");
+    return ccLoad(refresh).then(function (items) {
+      CC.items = items; CC.tried = {}; CC.loaded = true;
+      $("cctvSetMsg").textContent = "CCTV " + items.length + "곳을 받았어요.";
+      if (!items.length) { ccShow(); return; }
+      ccShow(); ccPlay(0, true);
+      // 3D 지도가 준비되면 위치 표시
+      var tries = 0, iv = setInterval(function () { if (T3 && T3.labelsMade) { clearInterval(iv); ccMakePins(); } else if (++tries > 90) clearInterval(iv); }, 1000);
+    }, function (e) {
+      CC.loaded = false; ccShow();
+      var why = e && e.message === "no-config" ? "설정 필요" : "목록을 받지 못했어요 (" + ((e && e.message) || "오류") + ")";
+      $("cctvSetMsg").textContent = why;
+    });
+  }
+  function ccInit() {
+    ccBindPick();
+    $("cctvPrev").addEventListener("click", function () { ccPlay(CC.idx - 1, false); });
+    $("cctvNext").addEventListener("click", function () { ccPlay(CC.idx + 1, false); });
+    $("cctvClose").addEventListener("click", function () { CC.open = false; ccStop(); ccShow(); });
+    $("cctvGear").addEventListener("click", function () { ccSetup(true); });
+    $("viewCctv").addEventListener("click", function () {
+      var c = ccCfg();
+      if (!c.relay && !c.key) { ccSetup(true); return; }
+      if (!CC.loaded) { CC.open = true; ccStart(false); return; }
+      CC.open = $("cctv").hidden; ccShow();
+      if (CC.open) ccPlay(CC.idx < 0 ? 0 : CC.idx, true); else ccStop();
+    });
+    $("cctvSave").addEventListener("click", function () {
+      var rv = $("cctvRelay").value.trim(), kv = $("cctvKey").value.trim();
+      try {
+        if (rv && !/^https:\/\/script\.google(usercontent)?\.com\//.test(rv)) { $("cctvSetMsg").textContent = "주소는 https://script.google.com/… 로 시작해야 해요."; return; }
+        if (rv) localStorage.setItem("solvay-cctv-relay", rv); else localStorage.removeItem("solvay-cctv-relay");
+        if (kv && kv !== "********") localStorage.setItem("solvay-its-key", kv);
+      } catch (e) {}
+      CC.open = true; ccStart(true);
+    });
+    $("cctvClear").addEventListener("click", function () {
+      try { localStorage.removeItem("solvay-cctv-relay"); localStorage.removeItem("solvay-its-key"); } catch (e) {}
+      $("cctvRelay").value = ""; $("cctvKey").value = ""; $("cctvSetMsg").textContent = "이 컴퓨터에 저장한 설정을 지웠어요.";
+    });
+    $("cctvSetClose").addEventListener("click", function () { ccSetup(false); });
+    var c = ccCfg();
+    if (c.relay || c.key) ccStart(false);
+  }
+
+  // =====================================================================
   // 소리 (음원 파일 없이 브라우저에서 직접 만듦)
   // =====================================================================
   var AU = { ctx: null, master: null, on: false, vol: 0.7, noise: null, loops: {}, lastBeep: 0, nextBird: 0, nextThunder: 0,
@@ -2702,6 +2962,7 @@ body[data-done] .banner.col { animation: none; }
   })();
 
   start3D();
+  try { ccInit(); } catch (e) {}
   drawCharts();
   window.__display = { D: D, T3: function () { return T3; } };
 })();
